@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content=" 近期查看有请求下游系统超时,按百分比的话是0.8%的样子,但是每天量很大,超时总数不到1亿次,如果这个可以优化一点,提升巨大的\n1.整体的探索过程 目前只知道最终结果是超时,但是是不是哪里代码写的有问题从而导致的超时,还需要去定位\n1.1初步定为问题 首先记录两个时间,第一个是请求一进来一直到拼接发送请求的位置这段代码的,第二个是拼接请求一直到Response(或者超时了)这段代码的时间\n超时情况:\n不超时情况:\n从图上来看,不管是超时和不超时都第一个时间都不长,所以是拼接请求到接受Response的时候引起的超时\n1.2更细化的定位问题 现在知道是和发送请求有关系了,那么应该对于这部分代码增加详细的记录,来分析问题\nOkHttp监控与调优查资料的时候看到这个文章写的不错\n经过一番查找资料,okhttp有一个EventListener,可以记录发送请求的各个步骤的时间\n于是就有了下边的代码\npublic class PrintingEventListener extends EventListener { @Override public void requestBodyEnd(@NotNull Call call, long byteCount) { printEvent(&#34;requestBodyEnd&#34;); } @Override public void requestBodyStart(@NotNull Call call) { printEvent(&#34;requestBodyStart&#34;); } @Override public void responseBodyEnd(@NotNull Call call, long byteCount) { printEvent(&#34;responseBodyEnd&#34;); } @Override public void responseBodyStart(@NotNull Call call) { printEvent(&#34;responseBodyStart&#34;); } @Override public void responseHeadersEnd(@NotNull Call call, @NotNull Response response) { printEvent(&#34;responseHeadersEnd&#34;); } @Override public void responseHeadersStart(@NotNull Call call) { printEvent(&#34;responseHeadersStart&#34;); } public static final Factory FACTORY = new Factory() { @Override public EventListener create(Call call) { //唯一标识 String randAllString = Format.getRandAllString(10); Random random = new Random(randAllString.hashCode()); double nextDouble = random.nextDouble(); //是tanx 与 10%的概率 if(call.request().url().toString().equals(&#34;xxx&#34;) &amp;&amp; nextDouble * 100 &lt;= 10){ InitServlet.okhttpTimeLog.plus(randAllString,&#34;startSend&#34;,0L,&#34;&#34;); //System.out.printf(&#34;%s %s%n&#34;, randAllString, call.request().url()); return new PrintingEventListener(randAllString, System.nanoTime()); }else{ return EventListener.NONE; } } }; final String callId; final long callStartNanos; public PrintingEventListener(String callId, long callStartNanos) { this.callId = callId; this.callStartNanos = callStartNanos; } private void printEvent(String name) { long elapsedNanos = System.nanoTime() - callStartNanos; InitServlet.okhttpTimeLog.plus(callId,name,elapsedNanos / 1000000L,&#34;&#34;); //System.out.printf(&#34;%s %.0fms %s%n&#34;, callId, elapsedNanos / 1000000d, name); } private void printEvent(String name,IOException ioe){ long elapsedNanos = System.nanoTime() - callStartNanos; InitServlet.okhttpTimeLog.plus(callId,name,elapsedNanos / 1000000L,ioe.getMessage()); //System.out.printf(&#34;%s %.0fms %s %s%n&#34;, callId, elapsedNanos / 1000000d, name,ioe.getMessage()); } @Override public void callStart(Call call) { printEvent(&#34;callStart&#34;); } @Override public void dnsStart(Call call, String domainName) { printEvent(&#34;dnsStart&#34;); } @Override public void dnsEnd(Call call, String domainName, List&lt;InetAddress&gt; inetAddressList) { printEvent(&#34;dnsEnd&#34;); } @Override public void connectStart(Call call, InetSocketAddress inetSocketAddress, Proxy proxy) { printEvent(&#34;connectStart&#34;); } @Override public void secureConnectStart(Call call) { printEvent(&#34;secureConnectStart&#34;); } @Override public void secureConnectEnd(Call call, @Nullable Handshake handshake) { printEvent(&#34;secureConnectEnd&#34;); } @Override public void connectEnd(Call call, InetSocketAddress inetSocketAddress, Proxy proxy, @Nullable Protocol protocol) { printEvent(&#34;connectEnd&#34;); } @Override public void connectFailed(Call call, InetSocketAddress inetSocketAddress, Proxy proxy, @Nullable Protocol protocol, IOException ioe) { printEvent(&#34;connectFailed&#34;); } @Override public void connectionAcquired(Call call, Connection connection) { printEvent(&#34;connectionAcquired&#34;); } @Override public void requestHeadersStart(Call call) { printEvent(&#34;requestHeadersStart&#34;); } @Override public void requestHeadersEnd(Call call, Request request) { printEvent(&#34;requestHeadersEnd&#34;); } @Override public void connectionReleased(Call call, Connection connection) { printEvent(&#34;connectionReleased&#34;); } @Override public void requestFailed(Call call, IOException ioe) { printEvent(&#34;requestFailed&#34;,ioe); } @Override public void responseFailed(Call call, IOException ioe) { printEvent(&#34;responseFailed&#34;,ioe); } @Override public void callFailed(Call call, IOException ioe) { printEvent(&#34;callFailed&#34;,ioe); } @Override public void callEnd(Call call) { printEvent(&#34;callEnd&#34;); } } 这个是记录的结果,这里只放一条数据了,可以明显看出来仅仅是等待Response的时候超时\n">
+<title>OkHttp优化过程记录</title>
+
+<link rel='canonical' href='http://localhost:1313/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="OkHttp优化过程记录">
+<meta property='og:description' content=" 近期查看有请求下游系统超时,按百分比的话是0.8%的样子,但是每天量很大,超时总数不到1亿次,如果这个可以优化一点,提升巨大的\n1.整体的探索过程 目前只知道最终结果是超时,但是是不是哪里代码写的有问题从而导致的超时,还需要去定位\n1.1初步定为问题 首先记录两个时间,第一个是请求一进来一直到拼接发送请求的位置这段代码的,第二个是拼接请求一直到Response(或者超时了)这段代码的时间\n超时情况:\n不超时情况:\n从图上来看,不管是超时和不超时都第一个时间都不长,所以是拼接请求到接受Response的时候引起的超时\n1.2更细化的定位问题 现在知道是和发送请求有关系了,那么应该对于这部分代码增加详细的记录,来分析问题\nOkHttp监控与调优查资料的时候看到这个文章写的不错\n经过一番查找资料,okhttp有一个EventListener,可以记录发送请求的各个步骤的时间\n于是就有了下边的代码\npublic class PrintingEventListener extends EventListener { @Override public void requestBodyEnd(@NotNull Call call, long byteCount) { printEvent(&#34;requestBodyEnd&#34;); } @Override public void requestBodyStart(@NotNull Call call) { printEvent(&#34;requestBodyStart&#34;); } @Override public void responseBodyEnd(@NotNull Call call, long byteCount) { printEvent(&#34;responseBodyEnd&#34;); } @Override public void responseBodyStart(@NotNull Call call) { printEvent(&#34;responseBodyStart&#34;); } @Override public void responseHeadersEnd(@NotNull Call call, @NotNull Response response) { printEvent(&#34;responseHeadersEnd&#34;); } @Override public void responseHeadersStart(@NotNull Call call) { printEvent(&#34;responseHeadersStart&#34;); } public static final Factory FACTORY = new Factory() { @Override public EventListener create(Call call) { //唯一标识 String randAllString = Format.getRandAllString(10); Random random = new Random(randAllString.hashCode()); double nextDouble = random.nextDouble(); //是tanx 与 10%的概率 if(call.request().url().toString().equals(&#34;xxx&#34;) &amp;&amp; nextDouble * 100 &lt;= 10){ InitServlet.okhttpTimeLog.plus(randAllString,&#34;startSend&#34;,0L,&#34;&#34;); //System.out.printf(&#34;%s %s%n&#34;, randAllString, call.request().url()); return new PrintingEventListener(randAllString, System.nanoTime()); }else{ return EventListener.NONE; } } }; final String callId; final long callStartNanos; public PrintingEventListener(String callId, long callStartNanos) { this.callId = callId; this.callStartNanos = callStartNanos; } private void printEvent(String name) { long elapsedNanos = System.nanoTime() - callStartNanos; InitServlet.okhttpTimeLog.plus(callId,name,elapsedNanos / 1000000L,&#34;&#34;); //System.out.printf(&#34;%s %.0fms %s%n&#34;, callId, elapsedNanos / 1000000d, name); } private void printEvent(String name,IOException ioe){ long elapsedNanos = System.nanoTime() - callStartNanos; InitServlet.okhttpTimeLog.plus(callId,name,elapsedNanos / 1000000L,ioe.getMessage()); //System.out.printf(&#34;%s %.0fms %s %s%n&#34;, callId, elapsedNanos / 1000000d, name,ioe.getMessage()); } @Override public void callStart(Call call) { printEvent(&#34;callStart&#34;); } @Override public void dnsStart(Call call, String domainName) { printEvent(&#34;dnsStart&#34;); } @Override public void dnsEnd(Call call, String domainName, List&lt;InetAddress&gt; inetAddressList) { printEvent(&#34;dnsEnd&#34;); } @Override public void connectStart(Call call, InetSocketAddress inetSocketAddress, Proxy proxy) { printEvent(&#34;connectStart&#34;); } @Override public void secureConnectStart(Call call) { printEvent(&#34;secureConnectStart&#34;); } @Override public void secureConnectEnd(Call call, @Nullable Handshake handshake) { printEvent(&#34;secureConnectEnd&#34;); } @Override public void connectEnd(Call call, InetSocketAddress inetSocketAddress, Proxy proxy, @Nullable Protocol protocol) { printEvent(&#34;connectEnd&#34;); } @Override public void connectFailed(Call call, InetSocketAddress inetSocketAddress, Proxy proxy, @Nullable Protocol protocol, IOException ioe) { printEvent(&#34;connectFailed&#34;); } @Override public void connectionAcquired(Call call, Connection connection) { printEvent(&#34;connectionAcquired&#34;); } @Override public void requestHeadersStart(Call call) { printEvent(&#34;requestHeadersStart&#34;); } @Override public void requestHeadersEnd(Call call, Request request) { printEvent(&#34;requestHeadersEnd&#34;); } @Override public void connectionReleased(Call call, Connection connection) { printEvent(&#34;connectionReleased&#34;); } @Override public void requestFailed(Call call, IOException ioe) { printEvent(&#34;requestFailed&#34;,ioe); } @Override public void responseFailed(Call call, IOException ioe) { printEvent(&#34;responseFailed&#34;,ioe); } @Override public void callFailed(Call call, IOException ioe) { printEvent(&#34;callFailed&#34;,ioe); } @Override public void callEnd(Call call) { printEvent(&#34;callEnd&#34;); } } 这个是记录的结果,这里只放一条数据了,可以明显看出来仅仅是等待Response的时候超时\n">
+<meta property='og:url' content='http://localhost:1313/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/'>
+<meta property='og:site_name' content='fang7日常开发博客'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2023-10-14T10:06:00&#43;08:00'/><meta property='article:modified_time' content='2023-10-14T10:06:00&#43;08:00'/>
+<meta name="twitter:title" content="OkHttp优化过程记录">
+<meta name="twitter:description" content=" 近期查看有请求下游系统超时,按百分比的话是0.8%的样子,但是每天量很大,超时总数不到1亿次,如果这个可以优化一点,提升巨大的\n1.整体的探索过程 目前只知道最终结果是超时,但是是不是哪里代码写的有问题从而导致的超时,还需要去定位\n1.1初步定为问题 首先记录两个时间,第一个是请求一进来一直到拼接发送请求的位置这段代码的,第二个是拼接请求一直到Response(或者超时了)这段代码的时间\n超时情况:\n不超时情况:\n从图上来看,不管是超时和不超时都第一个时间都不长,所以是拼接请求到接受Response的时候引起的超时\n1.2更细化的定位问题 现在知道是和发送请求有关系了,那么应该对于这部分代码增加详细的记录,来分析问题\nOkHttp监控与调优查资料的时候看到这个文章写的不错\n经过一番查找资料,okhttp有一个EventListener,可以记录发送请求的各个步骤的时间\n于是就有了下边的代码\npublic class PrintingEventListener extends EventListener { @Override public void requestBodyEnd(@NotNull Call call, long byteCount) { printEvent(&#34;requestBodyEnd&#34;); } @Override public void requestBodyStart(@NotNull Call call) { printEvent(&#34;requestBodyStart&#34;); } @Override public void responseBodyEnd(@NotNull Call call, long byteCount) { printEvent(&#34;responseBodyEnd&#34;); } @Override public void responseBodyStart(@NotNull Call call) { printEvent(&#34;responseBodyStart&#34;); } @Override public void responseHeadersEnd(@NotNull Call call, @NotNull Response response) { printEvent(&#34;responseHeadersEnd&#34;); } @Override public void responseHeadersStart(@NotNull Call call) { printEvent(&#34;responseHeadersStart&#34;); } public static final Factory FACTORY = new Factory() { @Override public EventListener create(Call call) { //唯一标识 String randAllString = Format.getRandAllString(10); Random random = new Random(randAllString.hashCode()); double nextDouble = random.nextDouble(); //是tanx 与 10%的概率 if(call.request().url().toString().equals(&#34;xxx&#34;) &amp;&amp; nextDouble * 100 &lt;= 10){ InitServlet.okhttpTimeLog.plus(randAllString,&#34;startSend&#34;,0L,&#34;&#34;); //System.out.printf(&#34;%s %s%n&#34;, randAllString, call.request().url()); return new PrintingEventListener(randAllString, System.nanoTime()); }else{ return EventListener.NONE; } } }; final String callId; final long callStartNanos; public PrintingEventListener(String callId, long callStartNanos) { this.callId = callId; this.callStartNanos = callStartNanos; } private void printEvent(String name) { long elapsedNanos = System.nanoTime() - callStartNanos; InitServlet.okhttpTimeLog.plus(callId,name,elapsedNanos / 1000000L,&#34;&#34;); //System.out.printf(&#34;%s %.0fms %s%n&#34;, callId, elapsedNanos / 1000000d, name); } private void printEvent(String name,IOException ioe){ long elapsedNanos = System.nanoTime() - callStartNanos; InitServlet.okhttpTimeLog.plus(callId,name,elapsedNanos / 1000000L,ioe.getMessage()); //System.out.printf(&#34;%s %.0fms %s %s%n&#34;, callId, elapsedNanos / 1000000d, name,ioe.getMessage()); } @Override public void callStart(Call call) { printEvent(&#34;callStart&#34;); } @Override public void dnsStart(Call call, String domainName) { printEvent(&#34;dnsStart&#34;); } @Override public void dnsEnd(Call call, String domainName, List&lt;InetAddress&gt; inetAddressList) { printEvent(&#34;dnsEnd&#34;); } @Override public void connectStart(Call call, InetSocketAddress inetSocketAddress, Proxy proxy) { printEvent(&#34;connectStart&#34;); } @Override public void secureConnectStart(Call call) { printEvent(&#34;secureConnectStart&#34;); } @Override public void secureConnectEnd(Call call, @Nullable Handshake handshake) { printEvent(&#34;secureConnectEnd&#34;); } @Override public void connectEnd(Call call, InetSocketAddress inetSocketAddress, Proxy proxy, @Nullable Protocol protocol) { printEvent(&#34;connectEnd&#34;); } @Override public void connectFailed(Call call, InetSocketAddress inetSocketAddress, Proxy proxy, @Nullable Protocol protocol, IOException ioe) { printEvent(&#34;connectFailed&#34;); } @Override public void connectionAcquired(Call call, Connection connection) { printEvent(&#34;connectionAcquired&#34;); } @Override public void requestHeadersStart(Call call) { printEvent(&#34;requestHeadersStart&#34;); } @Override public void requestHeadersEnd(Call call, Request request) { printEvent(&#34;requestHeadersEnd&#34;); } @Override public void connectionReleased(Call call, Connection connection) { printEvent(&#34;connectionReleased&#34;); } @Override public void requestFailed(Call call, IOException ioe) { printEvent(&#34;requestFailed&#34;,ioe); } @Override public void responseFailed(Call call, IOException ioe) { printEvent(&#34;responseFailed&#34;,ioe); } @Override public void callFailed(Call call, IOException ioe) { printEvent(&#34;callFailed&#34;,ioe); } @Override public void callEnd(Call call) { printEvent(&#34;callEnd&#34;); } } 这个是记录的结果,这里只放一条数据了,可以明显看出来仅仅是等待Response的时候超时\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu13739649187745961479.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">fang7日常开发博客</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/">OkHttp优化过程记录</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Oct 14, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <blockquote>
+<p>近期查看有请求下游系统超时,按百分比的话是0.8%的样子,但是每天量很大,超时总数不到1亿次,如果这个可以优化一点,提升巨大的</p>
+</blockquote>
+<h1 id="1整体的探索过程">1.整体的探索过程
+</h1><blockquote>
+<p>目前只知道最终结果是超时,但是是不是哪里代码写的有问题从而导致的超时,还需要去定位</p>
+</blockquote>
+<h2 id="11初步定为问题">1.1初步定为问题
+</h2><p>首先记录两个时间,第一个是请求一进来一直到拼接发送请求的位置这段代码的,第二个是拼接请求一直到Response(或者超时了)这段代码的时间<br>
+超时情况:<br>
+<img src="/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/731e42fcb6ab158c698b819c85ddddb3ed95365b.png"
+	width="1622"
+	height="962"
+	srcset="/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/731e42fcb6ab158c698b819c85ddddb3ed95365b_hu959709198380300150.png 480w, /post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/731e42fcb6ab158c698b819c85ddddb3ed95365b_hu1282212480590999554.png 1024w"
+	loading="lazy"
+	
+		alt="image-1697245681908"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="168"
+		data-flex-basis="404px"
+	
+>
+不超时情况:<br>
+<img src="/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/4a003a4dca4afea5db00df10c5848a7bd241698d.png"
+	width="1586"
+	height="916"
+	srcset="/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/4a003a4dca4afea5db00df10c5848a7bd241698d_hu14326980663132857269.png 480w, /post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/4a003a4dca4afea5db00df10c5848a7bd241698d_hu17658798224294194040.png 1024w"
+	loading="lazy"
+	
+		alt="image-1697245800201"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="173"
+		data-flex-basis="415px"
+	
+>
+从图上来看,不管是超时和不超时都第一个时间都不长,所以是拼接请求到接受Response的时候引起的超时</p>
+<h2 id="12更细化的定位问题">1.2更细化的定位问题
+</h2><blockquote>
+<p>现在知道是和发送请求有关系了,那么应该对于这部分代码增加详细的记录,来分析问题</p>
+</blockquote>
+<p><a class="link" href="https://zhaoxiaofa.com/2021/09/03/OkHttp%E7%9B%91%E6%8E%A7%E4%B8%8E%E8%B0%83%E4%BC%98/"  target="_blank" rel="noopener"
+    >OkHttp监控与调优</a>查资料的时候看到这个文章写的不错<br>
+经过一番查找资料,okhttp有一个EventListener,可以记录发送请求的各个步骤的时间<br>
+于是就有了下边的代码</p>
+<pre tabindex="0"><code>public class PrintingEventListener extends EventListener {
+    @Override
+    public void requestBodyEnd(@NotNull Call call, long byteCount) {
+        printEvent(&#34;requestBodyEnd&#34;);
+    }
+
+    @Override
+    public void requestBodyStart(@NotNull Call call) {
+        printEvent(&#34;requestBodyStart&#34;);
+    }
+
+    @Override
+    public void responseBodyEnd(@NotNull Call call, long byteCount) {
+        printEvent(&#34;responseBodyEnd&#34;);
+    }
+
+    @Override
+    public void responseBodyStart(@NotNull Call call) {
+        printEvent(&#34;responseBodyStart&#34;);
+    }
+
+    @Override
+    public void responseHeadersEnd(@NotNull Call call, @NotNull Response response) {
+        printEvent(&#34;responseHeadersEnd&#34;);
+    }
+
+    @Override
+    public void responseHeadersStart(@NotNull Call call) {
+        printEvent(&#34;responseHeadersStart&#34;);
+    }
+
+    public static final Factory FACTORY = new Factory() {
+
+        @Override public EventListener create(Call call) {
+            //唯一标识
+            String randAllString = Format.getRandAllString(10);
+            Random random = new Random(randAllString.hashCode());
+            double nextDouble = random.nextDouble();
+            //是tanx 与 10%的概率
+            if(call.request().url().toString().equals(&#34;xxx&#34;)
+                    &amp;&amp; nextDouble * 100 &lt;= 10){
+                InitServlet.okhttpTimeLog.plus(randAllString,&#34;startSend&#34;,0L,&#34;&#34;);
+                //System.out.printf(&#34;%s %s%n&#34;, randAllString, call.request().url());
+                return new PrintingEventListener(randAllString, System.nanoTime());
+            }else{
+                return EventListener.NONE;
+            }
+        }
+    };
+
+    final String callId;
+    final long callStartNanos;
+
+    public PrintingEventListener(String callId, long callStartNanos) {
+        this.callId = callId;
+        this.callStartNanos = callStartNanos;
+    }
+
+    private void printEvent(String name) {
+        long elapsedNanos = System.nanoTime() - callStartNanos;
+        InitServlet.okhttpTimeLog.plus(callId,name,elapsedNanos / 1000000L,&#34;&#34;);
+        //System.out.printf(&#34;%s %.0fms %s%n&#34;, callId, elapsedNanos / 1000000d, name);
+    }
+
+    private void printEvent(String name,IOException ioe){
+        long elapsedNanos = System.nanoTime() - callStartNanos;
+        InitServlet.okhttpTimeLog.plus(callId,name,elapsedNanos / 1000000L,ioe.getMessage());
+        //System.out.printf(&#34;%s %.0fms %s %s%n&#34;, callId, elapsedNanos / 1000000d, name,ioe.getMessage());
+    }
+
+    @Override
+    public void callStart(Call call) {
+        printEvent(&#34;callStart&#34;);
+    }
+
+    @Override
+    public void dnsStart(Call call, String domainName) {
+        printEvent(&#34;dnsStart&#34;);
+    }
+
+    @Override
+    public void dnsEnd(Call call, String domainName, List&lt;InetAddress&gt; inetAddressList) {
+        printEvent(&#34;dnsEnd&#34;);
+    }
+
+    @Override
+    public void connectStart(Call call, InetSocketAddress inetSocketAddress, Proxy proxy) {
+        printEvent(&#34;connectStart&#34;);
+    }
+
+    @Override
+    public void secureConnectStart(Call call) {
+        printEvent(&#34;secureConnectStart&#34;);
+    }
+
+    @Override
+    public void secureConnectEnd(Call call, @Nullable Handshake handshake) {
+        printEvent(&#34;secureConnectEnd&#34;);
+    }
+
+    @Override
+    public void connectEnd(Call call, InetSocketAddress inetSocketAddress, Proxy proxy, @Nullable Protocol protocol) {
+        printEvent(&#34;connectEnd&#34;);
+    }
+
+    @Override
+    public void connectFailed(Call call, InetSocketAddress inetSocketAddress, Proxy proxy, @Nullable Protocol protocol, IOException ioe) {
+        printEvent(&#34;connectFailed&#34;);
+    }
+
+    @Override
+    public void connectionAcquired(Call call, Connection connection) {
+        printEvent(&#34;connectionAcquired&#34;);
+    }
+
+    @Override
+    public void requestHeadersStart(Call call) {
+        printEvent(&#34;requestHeadersStart&#34;);
+    }
+
+    @Override
+    public void requestHeadersEnd(Call call, Request request) {
+        printEvent(&#34;requestHeadersEnd&#34;);
+    }
+
+    @Override
+    public void connectionReleased(Call call, Connection connection) {
+        printEvent(&#34;connectionReleased&#34;);
+    }
+
+    @Override
+    public void requestFailed(Call call, IOException ioe) {
+        printEvent(&#34;requestFailed&#34;,ioe);
+    }
+
+    @Override
+    public void responseFailed(Call call, IOException ioe) {
+        printEvent(&#34;responseFailed&#34;,ioe);
+    }
+
+    @Override
+    public void callFailed(Call call, IOException ioe) {
+        printEvent(&#34;callFailed&#34;,ioe);
+    }
+
+    @Override public void callEnd(Call call) {
+        printEvent(&#34;callEnd&#34;);
+    }
+
+}
+</code></pre><p>这个是记录的结果,这里只放一条数据了,可以明显看出来仅仅是等待Response的时候超时<br>
+<img src="/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/5c354dbb64d42457b94bbc762023cb6ae3d85bde.png"
+	width="1594"
+	height="734"
+	srcset="/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/5c354dbb64d42457b94bbc762023cb6ae3d85bde_hu8966688172176265007.png 480w, /post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/5c354dbb64d42457b94bbc762023cb6ae3d85bde_hu10377475572011981773.png 1024w"
+	loading="lazy"
+	
+		alt="image-1697247499791"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="217"
+		data-flex-basis="521px"
+	
+></p>
+<h1 id="2寻求优化问题的方法">2.寻求优化问题的方法
+</h1><blockquote>
+<p>这个问题的根本原因是下游响应时间长导致的,首先我们是不可能去干预下游系统的,那从我们自身来看,有哪些可以优化的地方呢?</p>
+</blockquote>
+<h2 id="21okhttp各种参数的检查">2.1okhttp各种参数的检查
+</h2><blockquote>
+<p>最常见的就是参数优化,调整参数之前需要有相应的日志或者当前数据来支持,没有数据的调参都是瞎搞</p>
+</blockquote>
+<p>经过一番查找资料,收集了几个okhttp的参数,开始做监控</p>
+<pre tabindex="0"><code>//新增监控发送给dsp的线程池
+            val queuedCallsCount = Java_To_Dsp_Handle.OkHttpClientTool.dispatcher.queuedCallsCount()
+            val runningCallsCount = Java_To_Dsp_Handle.OkHttpClientTool.dispatcher.runningCallsCount()
+            val connectionCount = Java_To_Dsp_Handle.OkHttpClientTool.connectionPool.connectionCount()
+            val idleConnectionCount = Java_To_Dsp_Handle.OkHttpClientTool.connectionPool.idleConnectionCount()
+            out.println(&#34;准备好发送的请求:${queuedCallsCount},正在发送的请求:${runningCallsCount}\n&#34;)
+            out.println(&#34;发送请求的线程池情况:${Java_To_Dsp_Handle.OkHttpClientTool.threadPool}\n&#34;)
+            out.println(&#34;目前建立的连接数量:${connectionCount},空闲的连接数量:${idleConnectionCount}\n&#34;)
+            //每个host的请求数
+            out.println(Java_To_Dsp_Handle.OkHttpClientTool.hostRequestCounterInterceptor.printRequestCountForHost())
+</code></pre><p>以下是执行完之后的打印</p>
+<pre tabindex="0"><code>准备好发送的请求:0,正在发送的请求:65
+
+发送请求的线程池情况:java.util.concurrent.ThreadPoolExecutor@3dceaaa5[Running, pool size = 600, active threads = 66, queued tasks = 0, completed tasks = 44826120]
+
+目前建立的连接数量:316,空闲的连接数量:260
+
+host:xxx  count:25
+</code></pre><p>分析打印的结果:</p>
+<ol>
+<li>准备好发送的请求如果有值的话,那么就可能发生等待,这里并没有</li>
+<li>发送请求的线程池也没有满,也没有等待的任务,所以这个也没问题</li>
+<li>再有就是空闲连接也没有达到设置的值,也没问题</li>
+<li>最后一个是每个host最大并发数,也远低于设置的值</li>
+</ol>
+<p>这一顿操作下来,发现参数并没有问题</p>
+<h2 id="22回归代码">2.2回归代码
+</h2><blockquote>
+<p>一般来说,陈年旧代码有优化空间的概率是比较大的,于是抱着试一试的心态,通读了okhttp发送的相关代码,发现确实有提升空间</p>
+</blockquote>
+<p>OkHttpClient对象一般是不会创建很多个,所以之前老代码的逻辑是分成5个OkHttpClient对象,也就是5个梯度的等待时间<br>
+比如当前需要等待67毫秒,那么按照梯度会选择超时时间设置为50的OkHttpClient对象,那么这个期间会有17ms的时间损失<br>
+一顿查资料以及测试之后发现,OkHttpClient对象每个请求new一个是不合适的,new这个对象时间比较长,但是可以调用OkHttpClient对象的<code>okclient.newBuilder()</code>{.language-plaintext
+.highlighter-rouge}方法重新设置超时时间,这种方式基本没有耗时</p>
+<p>升级完成之后,Response的数量有所上涨,超时率数据目前还没出来,等出来了会补上,至此整个分析以及优化过程告一段落</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 fang7日常开发博客
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.2e7ac20e639db4b8c03c1746c5f5e77276880ae83598ad087ed088084c28654b.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

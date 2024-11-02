@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="java 四舍五入问题 前两天,在工作中遇到了一个问题,公司运营说:&quot;我上传数据,没有给我四舍五入,是不是你程序有问题?&quot;.那我当时肯定是想程序都用这么长时间了...不能有问题吧. 但是还是说:&quot;把具体的问题数据,以及什么可以重现,都说一下&quot;,接下来是解决问题的心路历程.\n复现bug 问题数据已经有了,接下来就是如何重现这个问题.主要的问题代码就是下边\nlong round = Math.round(Double.valueOf(&#34;150.795&#34;) * 100); System.out.println(round); 其中Double.valueOf(&quot;150.795&quot;){.language-plaintext .highlighter-rouge}没有问题,然后 做*100{.language-plaintext .highlighter-rouge}操作,这里结果就有问题了,结果是15079.499999999998{.language-plaintext .highlighter-rouge}.\n之前都说 double不准什么的,也没体会到,现在真的是体会到了......\n解决问题 最终是需要实现 四舍五入保留两位小数,那就去看BigDecimal{.language-plaintext .highlighter-rouge}这个吧,都说这个计算是准确的.\nprivate Double round(double f) { BigDecimal b = BigDecimal.valueOf(f); return b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue(); } 最终使用的是这个解决方案.\n但是这里也有个坑,就是传入的double最好是没有计算过的,不然也会出现上边 *100{.language-plaintext .highlighter-rouge}之后结果有问题\n一般来说界面填写数值,然后传入到后端获取都是 String{.language-plaintext .highlighter-rouge}类型的,直接调用方法就行,如果需要计算的话,用BigDecimal{.language-plaintext .highlighter-rouge}计算\n">
+<title>java 四舍五入问题</title>
+
+<link rel='canonical' href='http://localhost:1313/post/java-%E5%9B%9B%E8%88%8D%E4%BA%94%E5%85%A5%E9%97%AE%E9%A2%98/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="java 四舍五入问题">
+<meta property='og:description' content="java 四舍五入问题 前两天,在工作中遇到了一个问题,公司运营说:&quot;我上传数据,没有给我四舍五入,是不是你程序有问题?&quot;.那我当时肯定是想程序都用这么长时间了...不能有问题吧. 但是还是说:&quot;把具体的问题数据,以及什么可以重现,都说一下&quot;,接下来是解决问题的心路历程.\n复现bug 问题数据已经有了,接下来就是如何重现这个问题.主要的问题代码就是下边\nlong round = Math.round(Double.valueOf(&#34;150.795&#34;) * 100); System.out.println(round); 其中Double.valueOf(&quot;150.795&quot;){.language-plaintext .highlighter-rouge}没有问题,然后 做*100{.language-plaintext .highlighter-rouge}操作,这里结果就有问题了,结果是15079.499999999998{.language-plaintext .highlighter-rouge}.\n之前都说 double不准什么的,也没体会到,现在真的是体会到了......\n解决问题 最终是需要实现 四舍五入保留两位小数,那就去看BigDecimal{.language-plaintext .highlighter-rouge}这个吧,都说这个计算是准确的.\nprivate Double round(double f) { BigDecimal b = BigDecimal.valueOf(f); return b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue(); } 最终使用的是这个解决方案.\n但是这里也有个坑,就是传入的double最好是没有计算过的,不然也会出现上边 *100{.language-plaintext .highlighter-rouge}之后结果有问题\n一般来说界面填写数值,然后传入到后端获取都是 String{.language-plaintext .highlighter-rouge}类型的,直接调用方法就行,如果需要计算的话,用BigDecimal{.language-plaintext .highlighter-rouge}计算\n">
+<meta property='og:url' content='http://localhost:1313/post/java-%E5%9B%9B%E8%88%8D%E4%BA%94%E5%85%A5%E9%97%AE%E9%A2%98/'>
+<meta property='og:site_name' content='fang7日常开发博客'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2021-01-02T15:42:00&#43;08:00'/><meta property='article:modified_time' content='2021-01-02T15:42:00&#43;08:00'/>
+<meta name="twitter:title" content="java 四舍五入问题">
+<meta name="twitter:description" content="java 四舍五入问题 前两天,在工作中遇到了一个问题,公司运营说:&quot;我上传数据,没有给我四舍五入,是不是你程序有问题?&quot;.那我当时肯定是想程序都用这么长时间了...不能有问题吧. 但是还是说:&quot;把具体的问题数据,以及什么可以重现,都说一下&quot;,接下来是解决问题的心路历程.\n复现bug 问题数据已经有了,接下来就是如何重现这个问题.主要的问题代码就是下边\nlong round = Math.round(Double.valueOf(&#34;150.795&#34;) * 100); System.out.println(round); 其中Double.valueOf(&quot;150.795&quot;){.language-plaintext .highlighter-rouge}没有问题,然后 做*100{.language-plaintext .highlighter-rouge}操作,这里结果就有问题了,结果是15079.499999999998{.language-plaintext .highlighter-rouge}.\n之前都说 double不准什么的,也没体会到,现在真的是体会到了......\n解决问题 最终是需要实现 四舍五入保留两位小数,那就去看BigDecimal{.language-plaintext .highlighter-rouge}这个吧,都说这个计算是准确的.\nprivate Double round(double f) { BigDecimal b = BigDecimal.valueOf(f); return b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue(); } 最终使用的是这个解决方案.\n但是这里也有个坑,就是传入的double最好是没有计算过的,不然也会出现上边 *100{.language-plaintext .highlighter-rouge}之后结果有问题\n一般来说界面填写数值,然后传入到后端获取都是 String{.language-plaintext .highlighter-rouge}类型的,直接调用方法就行,如果需要计算的话,用BigDecimal{.language-plaintext .highlighter-rouge}计算\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu13739649187745961479.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">fang7日常开发博客</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/java-%E5%9B%9B%E8%88%8D%E4%BA%94%E5%85%A5%E9%97%AE%E9%A2%98/">java 四舍五入问题</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jan 02, 2021</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 1 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="java-四舍五入问题">java 四舍五入问题
+</h1><blockquote>
+<p>前两天,在工作中遇到了一个问题,公司运营说:&quot;我上传数据,没有给我四舍五入,是不是你程序有问题?&quot;.那我当时肯定是想程序都用这么长时间了...不能有问题吧.
+但是还是说:&quot;把具体的问题数据,以及什么可以重现,都说一下&quot;,接下来是解决问题的心路历程.</p>
+</blockquote>
+<h2 id="复现bug">复现bug
+</h2><p>问题数据已经有了,接下来就是如何重现这个问题.主要的问题代码就是下边</p>
+<pre tabindex="0"><code>long round = Math.round(Double.valueOf(&#34;150.795&#34;) * 100);
+        System.out.println(round);
+</code></pre><p><strong>其中<code>Double.valueOf(&quot;150.795&quot;)</code>{.language-plaintext
+.highlighter-rouge}没有问题,然后 做<code>*100</code>{.language-plaintext
+.highlighter-rouge}操作,这里结果就有问题了,结果是<code>15079.499999999998</code>{.language-plaintext
+.highlighter-rouge}.</strong></p>
+<p>之前都说 double不准什么的,也没体会到,现在真的是体会到了......</p>
+<h2 id="解决问题">解决问题
+</h2><p>最终是需要实现
+四舍五入保留两位小数,那就去看<code>BigDecimal</code>{.language-plaintext
+.highlighter-rouge}这个吧,都说这个计算是准确的.</p>
+<pre tabindex="0"><code>    private Double round(double f) {
+        BigDecimal b =  BigDecimal.valueOf(f);
+        return b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
+</code></pre><p>最终使用的是这个解决方案.</p>
+<p>但是这里也有个坑,就是传入的double最好是没有计算过的,不然也会出现上边
+<code>*100</code>{.language-plaintext .highlighter-rouge}之后结果有问题</p>
+<p>一般来说界面填写数值,然后传入到后端获取都是 <code>String</code>{.language-plaintext
+.highlighter-rouge}类型的,直接调用方法就行,如果需要计算的话,用<code>BigDecimal</code>{.language-plaintext
+.highlighter-rouge}计算</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 fang7日常开发博客
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.2e7ac20e639db4b8c03c1746c5f5e77276880ae83598ad087ed088084c28654b.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

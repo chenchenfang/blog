@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="1.三个时间的含义 {#1.%E4%B8%89%E4%B8%AA%E6%97%B6%E9%97%B4%E7%9A%84%E5%90%AB%E4%B9%89 tabindex=&quot;-1&quot;} access time （atime）\n当&quot;该文件的内容被取用&quot;时，就会更新这个读取时间 （access）。 modification time （mtime）\n当该文件的&quot;内容数据&quot;变更时，就会更新这个时间，内容数据指的是文件的内容，而不是文件的属性或权限。 status time （ctime）\n当该文件的&quot;状态 （status）&ldquo;改变时，就会更新这个时间。\n举例来说，像是权限与属性被更改了，文件内容修改，都会修改这个时间。 2.查看这三个时间的命令 {#2.%E6%9F%A5%E7%9C%8B%E8%BF%99%E4%B8%89%E4%B8%AA%E6%97%B6%E9%97%B4%E7%9A%84%E5%91%BD%E4%BB%A4 tabindex=&quot;-1&rdquo;} 1.stat命令 {#1.stat%E5%91%BD%E4%BB%A4 tabindex=&quot;-1&quot;} [root@agent-54 ~]# stat a.txt File: &#34;a.txt&#34; Size: 0 Blocks: 0 IO Block: 4096 普通空文件 Device: fd01h/64769d Inode: 394816 Links: 1 Access: (0644/-rw-r--r--) Uid: ( 0/ root) Gid: ( 0/ root) Access: 2021-01-01 01:01:00.000000000 +0800 Modify: 2021-01-01 01:01:00.000000000 +0800 Change: 2022-04-18 21:50:49.546704098 +0800 里边三个时间分别对应介绍的三个时间\n2.ls查看 {#2.ls%E6%9F%A5%E7%9C%8B tabindex=&quot;-1&quot;} [root@agent-54 ~]# ls --full-time --time=atime a.txt -rw-r--r-- 1 root root 0 2021-01-01 01:01:00.000000000 +0800 a.txt [root@agent-54 ~]# ls --full-time a.txt -rw-r--r-- 1 root root 0 2021-01-01 01:01:00.000000000 +0800 a.txt [root@agent-54 ~]# ls --full-time --time=ctime a.txt -rw-r--r-- 1 root root 0 2022-04-18 21:50:49.546704098 +0800 a.txt 3.touch修改access time和modification time {#3.touch%E4%BF%AE%E6%94%B9access-time%E5%92%8Cmodification-time tabindex=&quot;-1&quot;} ctime是修改不了的，它是随着另外两个时间的变化而变化\n">
+<title>Linux下的atime mtime ctime查看以及修改</title>
+
+<link rel='canonical' href='http://localhost:1313/post/linux%E4%B8%8B%E7%9A%84atime-mtime-ctime%E6%9F%A5%E7%9C%8B%E4%BB%A5%E5%8F%8A%E4%BF%AE%E6%94%B9/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Linux下的atime mtime ctime查看以及修改">
+<meta property='og:description' content="1.三个时间的含义 {#1.%E4%B8%89%E4%B8%AA%E6%97%B6%E9%97%B4%E7%9A%84%E5%90%AB%E4%B9%89 tabindex=&quot;-1&quot;} access time （atime）\n当&quot;该文件的内容被取用&quot;时，就会更新这个读取时间 （access）。 modification time （mtime）\n当该文件的&quot;内容数据&quot;变更时，就会更新这个时间，内容数据指的是文件的内容，而不是文件的属性或权限。 status time （ctime）\n当该文件的&quot;状态 （status）&ldquo;改变时，就会更新这个时间。\n举例来说，像是权限与属性被更改了，文件内容修改，都会修改这个时间。 2.查看这三个时间的命令 {#2.%E6%9F%A5%E7%9C%8B%E8%BF%99%E4%B8%89%E4%B8%AA%E6%97%B6%E9%97%B4%E7%9A%84%E5%91%BD%E4%BB%A4 tabindex=&quot;-1&rdquo;} 1.stat命令 {#1.stat%E5%91%BD%E4%BB%A4 tabindex=&quot;-1&quot;} [root@agent-54 ~]# stat a.txt File: &#34;a.txt&#34; Size: 0 Blocks: 0 IO Block: 4096 普通空文件 Device: fd01h/64769d Inode: 394816 Links: 1 Access: (0644/-rw-r--r--) Uid: ( 0/ root) Gid: ( 0/ root) Access: 2021-01-01 01:01:00.000000000 +0800 Modify: 2021-01-01 01:01:00.000000000 +0800 Change: 2022-04-18 21:50:49.546704098 +0800 里边三个时间分别对应介绍的三个时间\n2.ls查看 {#2.ls%E6%9F%A5%E7%9C%8B tabindex=&quot;-1&quot;} [root@agent-54 ~]# ls --full-time --time=atime a.txt -rw-r--r-- 1 root root 0 2021-01-01 01:01:00.000000000 +0800 a.txt [root@agent-54 ~]# ls --full-time a.txt -rw-r--r-- 1 root root 0 2021-01-01 01:01:00.000000000 +0800 a.txt [root@agent-54 ~]# ls --full-time --time=ctime a.txt -rw-r--r-- 1 root root 0 2022-04-18 21:50:49.546704098 +0800 a.txt 3.touch修改access time和modification time {#3.touch%E4%BF%AE%E6%94%B9access-time%E5%92%8Cmodification-time tabindex=&quot;-1&quot;} ctime是修改不了的，它是随着另外两个时间的变化而变化\n">
+<meta property='og:url' content='http://localhost:1313/post/linux%E4%B8%8B%E7%9A%84atime-mtime-ctime%E6%9F%A5%E7%9C%8B%E4%BB%A5%E5%8F%8A%E4%BF%AE%E6%94%B9/'>
+<meta property='og:site_name' content='fang7日常开发博客'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2022-04-18T22:27:00&#43;08:00'/><meta property='article:modified_time' content='2022-04-18T22:27:00&#43;08:00'/>
+<meta name="twitter:title" content="Linux下的atime mtime ctime查看以及修改">
+<meta name="twitter:description" content="1.三个时间的含义 {#1.%E4%B8%89%E4%B8%AA%E6%97%B6%E9%97%B4%E7%9A%84%E5%90%AB%E4%B9%89 tabindex=&quot;-1&quot;} access time （atime）\n当&quot;该文件的内容被取用&quot;时，就会更新这个读取时间 （access）。 modification time （mtime）\n当该文件的&quot;内容数据&quot;变更时，就会更新这个时间，内容数据指的是文件的内容，而不是文件的属性或权限。 status time （ctime）\n当该文件的&quot;状态 （status）&ldquo;改变时，就会更新这个时间。\n举例来说，像是权限与属性被更改了，文件内容修改，都会修改这个时间。 2.查看这三个时间的命令 {#2.%E6%9F%A5%E7%9C%8B%E8%BF%99%E4%B8%89%E4%B8%AA%E6%97%B6%E9%97%B4%E7%9A%84%E5%91%BD%E4%BB%A4 tabindex=&quot;-1&rdquo;} 1.stat命令 {#1.stat%E5%91%BD%E4%BB%A4 tabindex=&quot;-1&quot;} [root@agent-54 ~]# stat a.txt File: &#34;a.txt&#34; Size: 0 Blocks: 0 IO Block: 4096 普通空文件 Device: fd01h/64769d Inode: 394816 Links: 1 Access: (0644/-rw-r--r--) Uid: ( 0/ root) Gid: ( 0/ root) Access: 2021-01-01 01:01:00.000000000 +0800 Modify: 2021-01-01 01:01:00.000000000 +0800 Change: 2022-04-18 21:50:49.546704098 +0800 里边三个时间分别对应介绍的三个时间\n2.ls查看 {#2.ls%E6%9F%A5%E7%9C%8B tabindex=&quot;-1&quot;} [root@agent-54 ~]# ls --full-time --time=atime a.txt -rw-r--r-- 1 root root 0 2021-01-01 01:01:00.000000000 +0800 a.txt [root@agent-54 ~]# ls --full-time a.txt -rw-r--r-- 1 root root 0 2021-01-01 01:01:00.000000000 +0800 a.txt [root@agent-54 ~]# ls --full-time --time=ctime a.txt -rw-r--r-- 1 root root 0 2022-04-18 21:50:49.546704098 +0800 a.txt 3.touch修改access time和modification time {#3.touch%E4%BF%AE%E6%94%B9access-time%E5%92%8Cmodification-time tabindex=&quot;-1&quot;} ctime是修改不了的，它是随着另外两个时间的变化而变化\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu13739649187745961479.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">fang7日常开发博客</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/linux%E4%B8%8B%E7%9A%84atime-mtime-ctime%E6%9F%A5%E7%9C%8B%E4%BB%A5%E5%8F%8A%E4%BF%AE%E6%94%B9/">Linux下的atime mtime ctime查看以及修改</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Apr 18, 2022</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="1三个时间的含义-1e4b889e4b8aae697b6e997b4e79a84e590abe4b989-tabindex-1">1.三个时间的含义 {#1.%E4%B8%89%E4%B8%AA%E6%97%B6%E9%97%B4%E7%9A%84%E5%90%AB%E4%B9%89 tabindex=&quot;-1&quot;}
+</h2><ul>
+<li>access time （atime）<br>
+当&quot;该文件的内容被取用&quot;时，就会更新这个读取时间 （access）。</li>
+<li>modification time （mtime）<br>
+当该文件的&quot;内容数据&quot;变更时，就会更新这个时间，内容数据指的是文件的内容，而不是文件的属性或权限。</li>
+<li>status time （ctime）<br>
+当该文件的&quot;状态 （status）&ldquo;改变时，就会更新这个时间。<br>
+举例来说，像是权限与属性被更改了，文件内容修改，都会修改这个时间。</li>
+</ul>
+<h2 id="2查看这三个时间的命令-2e69fa5e79c8be8bf99e4b889e4b8aae697b6e997b4e79a84e591bde4bba4-tabindex-1">2.查看这三个时间的命令 {#2.%E6%9F%A5%E7%9C%8B%E8%BF%99%E4%B8%89%E4%B8%AA%E6%97%B6%E9%97%B4%E7%9A%84%E5%91%BD%E4%BB%A4 tabindex=&quot;-1&rdquo;}
+</h2><h3 id="1stat命令-1state591bde4bba4-tabindex-1">1.stat命令 {#1.stat%E5%91%BD%E4%BB%A4 tabindex=&quot;-1&quot;}
+</h3><pre tabindex="0"><code>[root@agent-54 ~]# stat a.txt
+  File: &#34;a.txt&#34;
+  Size: 0           Blocks: 0          IO Block: 4096   普通空文件
+Device: fd01h/64769d    Inode: 394816      Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2021-01-01 01:01:00.000000000 +0800
+Modify: 2021-01-01 01:01:00.000000000 +0800
+Change: 2022-04-18 21:50:49.546704098 +0800
+</code></pre><p>里边三个时间分别对应介绍的三个时间</p>
+<h3 id="2ls查看-2lse69fa5e79c8b-tabindex-1">2.ls查看 {#2.ls%E6%9F%A5%E7%9C%8B tabindex=&quot;-1&quot;}
+</h3><pre tabindex="0"><code>[root@agent-54 ~]# ls  --full-time --time=atime a.txt
+-rw-r--r-- 1 root root 0 2021-01-01 01:01:00.000000000 +0800 a.txt
+[root@agent-54 ~]# ls  --full-time  a.txt
+-rw-r--r-- 1 root root 0 2021-01-01 01:01:00.000000000 +0800 a.txt
+[root@agent-54 ~]# ls  --full-time --time=ctime a.txt
+-rw-r--r-- 1 root root 0 2022-04-18 21:50:49.546704098 +0800 a.txt
+</code></pre><h2 id="3touch修改access-time和modification-time-3touche4bfaee694b9access-timee5928cmodification-time-tabindex-1">3.touch修改access time和modification time {#3.touch%E4%BF%AE%E6%94%B9access-time%E5%92%8Cmodification-time tabindex=&quot;-1&quot;}
+</h2><blockquote>
+<p>ctime是修改不了的，它是随着另外两个时间的变化而变化</p>
+</blockquote>
+<p>首先我们来看一个 touch的help信息</p>
+<pre tabindex="0"><code>[root@agent-54 ~]# touch --help
+用法：touch [选项]... 文件...
+将每个文件的访问时间和修改时间改为当前时间。
+
+不存在的文件将会被创建为空文件，除非使用-c 或-h 选项。
+
+如果文件名为&#34;-&#34;则特殊处理，更改与标准输出相关的文件的访问时间。
+
+长选项必须使用的参数对于短选项时也是必需使用的。
+  -a            只更改访问时间
+  -c, --no-create   不创建任何文件
+  -d, --date=字符串    使用指定字符串表示时间而非当前时间
+  -f            (忽略)
+  -h, --no-dereference      会影响符号链接本身，而非符号链接所指示的目的地
+                (当系统支持更改符号链接的所有者时，此选项才有用)
+  -m            只更改修改时间
+  -r, --reference=文件    使用指定文件的时间属性而非当前时间
+  -t STAMP      使用[[CC]YY]MMDDhhmm[.ss] 格式的时间而非当前时间
+  --time=WORD       使用WORD 指定的时间：access、atime、use 都等于-a
+            选项的效果，而modify、mtime 等于-m 选项的效果
+      --help        显示此帮助信息并退出
+      --version     显示版本信息并退出
+
+请注意，-d 和-t 选项可接受不同的时间/日期格式。
+
+请向bug-coreutils@gnu.org 报告touch 的错误
+GNU coreutils 项目主页：&lt;http://www.gnu.org/software/coreutils/&gt;
+GNU 软件一般性帮助：&lt;http://www.gnu.org/gethelp/&gt;
+请向&lt;http://translationproject.org/team/zh_CN.html&gt; 报告touch 的翻译错误
+要获取完整文档，请运行：info coreutils &#39;touch invocation&#39;
+</code></pre><p>其中 -a -m 用来修改不同的时间，-t 指定要修改的具体时间</p>
+<pre tabindex="0"><code>[root@agent-54 ~]# touch -a -t 202002030355 a.txt
+[root@agent-54 ~]# stat a.txt
+  File: &#34;a.txt&#34;
+  Size: 0           Blocks: 0          IO Block: 4096   普通空文件
+Device: fd01h/64769d    Inode: 394816      Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2020-02-03 03:55:00.000000000 +0800
+Modify: 2021-01-01 01:01:00.000000000 +0800
+Change: 2022-04-18 22:23:12.490390037 +0800
+
+
+[root@agent-54 ~]# touch -m -t 202006060606 a.txt
+[root@agent-54 ~]# stat a.txt
+  File: &#34;a.txt&#34;
+  Size: 0           Blocks: 0          IO Block: 4096   普通空文件
+Device: fd01h/64769d    Inode: 394816      Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2020-02-03 03:55:00.000000000 +0800
+Modify: 2020-06-06 06:06:00.000000000 +0800
+Change: 2022-04-18 22:26:28.588715086 +0800
+</code></pre>
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 fang7日常开发博客
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.2e7ac20e639db4b8c03c1746c5f5e77276880ae83598ad087ed088084c28654b.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

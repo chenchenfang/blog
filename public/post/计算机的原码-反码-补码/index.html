@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="原码 反码 补码 一:为什么会有原码反码补码? 为了让计算机更简单的计算数值.所以计算机用补码\n具体怎么实现,后边会说,接下来先看一下 什么是原码 反码和补码\n二:正数的原码 反码 补码 网上大多都是按 原码 反码 补码 分别去介绍,博主(本人)感觉这样的方法并不方便理解.所以改用 正数和负数来说\n如果按int来的话,0太多了,看着不方便,就是8位来表示吧.\n正数就是 把十进制的数 变成二进制而已\n正数的原码 反码 补码是一样的{.language-plaintext .highlighter-rouge}\n[+1] = [00000001]（原码） = [00000001]（反码） = [00000001]（补码）\n三:负数的原码 反码 补码 原码:最高位为1{.language-plaintext .highlighter-rouge} 代表这个数是负数\n反码: 符号位不变{.language-plaintext .highlighter-rouge},其他位取反\n补码: 反码 + 1{.language-plaintext .highlighter-rouge}\n[-1] = [10000001]（原码） = [11111110]（反码） = [11111111]（补码）\n四:原码 反码 补码出现的意义 他们的出现都是为了让计算机计算的更加简单,从而性能更好.\n知识: 1 - 1 = 1 + (-1) 所以机器可以只有加法.\n首先如果只是原码计算,人可以很方便的计算出数值,因为人可以分清符号位.\n可是计算机想识别符号位,是很麻烦的.有什么方法能让计算机更简单的计算呢,于是就有了反码.\n">
+<title>计算机的原码 反码 补码</title>
+
+<link rel='canonical' href='http://localhost:1313/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E5%8E%9F%E7%A0%81-%E5%8F%8D%E7%A0%81-%E8%A1%A5%E7%A0%81/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="计算机的原码 反码 补码">
+<meta property='og:description' content="原码 反码 补码 一:为什么会有原码反码补码? 为了让计算机更简单的计算数值.所以计算机用补码\n具体怎么实现,后边会说,接下来先看一下 什么是原码 反码和补码\n二:正数的原码 反码 补码 网上大多都是按 原码 反码 补码 分别去介绍,博主(本人)感觉这样的方法并不方便理解.所以改用 正数和负数来说\n如果按int来的话,0太多了,看着不方便,就是8位来表示吧.\n正数就是 把十进制的数 变成二进制而已\n正数的原码 反码 补码是一样的{.language-plaintext .highlighter-rouge}\n[+1] = [00000001]（原码） = [00000001]（反码） = [00000001]（补码）\n三:负数的原码 反码 补码 原码:最高位为1{.language-plaintext .highlighter-rouge} 代表这个数是负数\n反码: 符号位不变{.language-plaintext .highlighter-rouge},其他位取反\n补码: 反码 + 1{.language-plaintext .highlighter-rouge}\n[-1] = [10000001]（原码） = [11111110]（反码） = [11111111]（补码）\n四:原码 反码 补码出现的意义 他们的出现都是为了让计算机计算的更加简单,从而性能更好.\n知识: 1 - 1 = 1 + (-1) 所以机器可以只有加法.\n首先如果只是原码计算,人可以很方便的计算出数值,因为人可以分清符号位.\n可是计算机想识别符号位,是很麻烦的.有什么方法能让计算机更简单的计算呢,于是就有了反码.\n">
+<meta property='og:url' content='http://localhost:1313/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E5%8E%9F%E7%A0%81-%E5%8F%8D%E7%A0%81-%E8%A1%A5%E7%A0%81/'>
+<meta property='og:site_name' content='fang7日常开发博客'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2020-09-26T19:18:07&#43;08:00'/><meta property='article:modified_time' content='2020-09-26T19:18:07&#43;08:00'/>
+<meta name="twitter:title" content="计算机的原码 反码 补码">
+<meta name="twitter:description" content="原码 反码 补码 一:为什么会有原码反码补码? 为了让计算机更简单的计算数值.所以计算机用补码\n具体怎么实现,后边会说,接下来先看一下 什么是原码 反码和补码\n二:正数的原码 反码 补码 网上大多都是按 原码 反码 补码 分别去介绍,博主(本人)感觉这样的方法并不方便理解.所以改用 正数和负数来说\n如果按int来的话,0太多了,看着不方便,就是8位来表示吧.\n正数就是 把十进制的数 变成二进制而已\n正数的原码 反码 补码是一样的{.language-plaintext .highlighter-rouge}\n[+1] = [00000001]（原码） = [00000001]（反码） = [00000001]（补码）\n三:负数的原码 反码 补码 原码:最高位为1{.language-plaintext .highlighter-rouge} 代表这个数是负数\n反码: 符号位不变{.language-plaintext .highlighter-rouge},其他位取反\n补码: 反码 + 1{.language-plaintext .highlighter-rouge}\n[-1] = [10000001]（原码） = [11111110]（反码） = [11111111]（补码）\n四:原码 反码 补码出现的意义 他们的出现都是为了让计算机计算的更加简单,从而性能更好.\n知识: 1 - 1 = 1 + (-1) 所以机器可以只有加法.\n首先如果只是原码计算,人可以很方便的计算出数值,因为人可以分清符号位.\n可是计算机想识别符号位,是很麻烦的.有什么方法能让计算机更简单的计算呢,于是就有了反码.\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu13739649187745961479.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">fang7日常开发博客</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E5%8E%9F%E7%A0%81-%E5%8F%8D%E7%A0%81-%E8%A1%A5%E7%A0%81/">计算机的原码 反码 补码</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 26, 2020</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 1 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="原码-反码-补码">原码 反码 补码
+</h1><h2 id="一为什么会有原码反码补码">一:为什么会有原码反码补码?
+</h2><p>为了让计算机更简单的计算数值.所以计算机用补码</p>
+<p>具体怎么实现,后边会说,接下来先看一下 什么是原码 反码和补码</p>
+<h2 id="二正数的原码-反码-补码">二:正数的原码 反码 补码
+</h2><blockquote>
+<p>网上大多都是按 原码 反码 补码
+分别去介绍,博主(本人)感觉这样的方法并不方便理解.所以改用
+正数和负数来说</p>
+</blockquote>
+<p>如果按int来的话,0太多了,看着不方便,就是8位来表示吧.</p>
+<p>正数就是 把十进制的数 变成二进制而已</p>
+<p>正数的<code>原码 反码 补码是一样的</code>{.language-plaintext .highlighter-rouge}</p>
+<p>[+1] = [00000001]（原码） = [00000001]（反码） =
+[00000001]（补码）</p>
+<h2 id="三负数的原码-反码-补码">三:负数的原码 反码 补码
+</h2><p>原码:<code>最高位为1</code>{.language-plaintext .highlighter-rouge}
+代表这个数是负数</p>
+<p>反码: <code>符号位不变</code>{.language-plaintext .highlighter-rouge},其他位取反</p>
+<p>补码: <code>反码 + 1</code>{.language-plaintext .highlighter-rouge}</p>
+<p>[-1] = [10000001]（原码） = [11111110]（反码） =
+[11111111]（补码）</p>
+<h2 id="四原码-反码-补码出现的意义">四:原码 反码 补码出现的意义
+</h2><blockquote>
+<p>他们的出现都是为了让计算机计算的更加简单,从而性能更好.</p>
+<p>知识: 1 - 1 = 1 + (-1) 所以机器可以只有加法.</p>
+</blockquote>
+<p>首先如果只是原码计算,人可以很方便的计算出数值,因为人可以分清符号位.</p>
+<p>可是计算机想识别符号位,是很麻烦的.有什么方法能让计算机更简单的计算呢,于是就有了反码.</p>
+<p>接下来看,反码的计算</p>
+<pre tabindex="0"><code> 1 - 1 = 1 + (-1)
+
+ = [0000 0001]原 + [1000 0001]原
+
+ = [0000 0001]反 + [1111 1110]反
+
+ = [1111 1111]反
+
+ = [1000 0000]原
+
+ = -0
+</code></pre><p><strong>反码已经可以让计算机计算更简单.但是为什么还有补码呢.</strong></p>
+<p>因为反码中0的编码 可以是 [1111 1111]反 = [-0]和[0000
+0000]反=[+0]</p>
+<p>正负0是没有意义的,所以补码是为了解决 0 有两个编码的问题.</p>
+<p>(其实到这里
+反码是不能直接看出来它代表哪个数,就需要理解了,补码再反码的基础上+1,就更加难理解,我也尝试用更简单的方法来表达出来,有问题可以提出写到评论里)</p>
+<p>补码中规定:<code>0的编码为[0000 0000]补 = [+0]</code>{.language-plaintext
+.highlighter-rouge}</p>
+<p>在这里先不要去想二进制代表的十进制数,只想象它是<code>编码</code>{.language-plaintext
+.highlighter-rouge}</p>
+<p>首先 8位的二进制,就只有0000 0000 到 1111 1111 这么多个编码 (从0000 0000
+开始+1)</p>
+<p>然后正数原码反码补码 都是一样的,那么咱们去掉0000 0000 到 0111 1111</p>
+<p>剩下的就是1000 0000 到 1111 1111 这些数值这些都是负数(因为符号位是1)</p>
+<p>这些编码挨个+1 是这样的</p>
+<pre tabindex="0"><code>1000 0000 
+1000 0001
+1000 0010
+....
+1111 1101
+1111 1110
+1111 1111
+</code></pre><p>首先这些编码 如果是原码那么对应成十进制就是</p>
+<pre tabindex="0"><code>-0
+-1
+-2
+....
+-125
+-126
+-127
+</code></pre><p>反码不是可以让计算机计算方便么,这些编码是反码 对应的十进制是</p>
+<pre tabindex="0"><code>-127
+-126
+-125
+...
+-2
+-1
+-0
+</code></pre><p>不是有-0么 怎么解决这个-0呢, 每个数-1,不就没有-0了么,最后变成了</p>
+<pre tabindex="0"><code>-128
+-127
+-126
+...
+-3
+-2
+-1
+</code></pre><p><strong>完美解决-0的编码问题,而且多了一个<code>-128</code>{.language-plaintext
+.highlighter-rouge},这就是为什么java中int取值范围是
+$-2^{31}$\ ~\ $2^{31}-1$</strong><br>
+好了现在讨论反码怎么才能变成这些数呢,<br>
+-1的反码是 1111 1110 ,然后现在-1的<code>编码</code>{.language-plaintext
+.highlighter-rouge}变成了1111 1111(这个就是-1的补码了)</p>
+<p>综上所述: <code>补码=反码+1</code>{.language-plaintext .highlighter-rouge}</p>
+<p>补码就是这么来的.所以计算机使用补码可以更快的是实现计算.(反码也可以,但是还是有-0问题,所以还是使用补码)</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 fang7日常开发博客
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.2e7ac20e639db4b8c03c1746c5f5e77276880ae83598ad087ed088084c28654b.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

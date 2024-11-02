@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="java创建线程的几种方式 一: 继承Thread 相当简单...\n重写run方法即可\npublic class TRunnbale extends Thread{ public static void main(String[] args) { TRunnbale tRunnbale = new TRunnbale(); tRunnbale.start(); } @Override public void run() { System.out.println(&#34;我要跑线程了&#34;); } } 二:实现Runnable接口 这个是最简单的方式,直接实现Runnable接口 然后实现run()方法\n最后放入 new Thread()中,然后 start()执行就行\npublic class TRunnbale { public static void main(String[] args) { new Thread(new MyTask()).start(); } } class MyTask implements Runnable{ @Override public void run() { System.out.println(&#34;我要跑线程了!&#34;); } } 三: 实现Callable接口 这个接口里需要实现的那个方法,是有一个返回值的,然后可以完成每个线程结束后,返回一个参数,线程外部可以接受这个参数\n">
+<title>java创建线程的几种方式</title>
+
+<link rel='canonical' href='http://localhost:1313/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="java创建线程的几种方式">
+<meta property='og:description' content="java创建线程的几种方式 一: 继承Thread 相当简单...\n重写run方法即可\npublic class TRunnbale extends Thread{ public static void main(String[] args) { TRunnbale tRunnbale = new TRunnbale(); tRunnbale.start(); } @Override public void run() { System.out.println(&#34;我要跑线程了&#34;); } } 二:实现Runnable接口 这个是最简单的方式,直接实现Runnable接口 然后实现run()方法\n最后放入 new Thread()中,然后 start()执行就行\npublic class TRunnbale { public static void main(String[] args) { new Thread(new MyTask()).start(); } } class MyTask implements Runnable{ @Override public void run() { System.out.println(&#34;我要跑线程了!&#34;); } } 三: 实现Callable接口 这个接口里需要实现的那个方法,是有一个返回值的,然后可以完成每个线程结束后,返回一个参数,线程外部可以接受这个参数\n">
+<meta property='og:url' content='http://localhost:1313/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/'>
+<meta property='og:site_name' content='fang7日常开发博客'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2020-11-19T22:33:07&#43;08:00'/><meta property='article:modified_time' content='2020-11-19T22:33:07&#43;08:00'/>
+<meta name="twitter:title" content="java创建线程的几种方式">
+<meta name="twitter:description" content="java创建线程的几种方式 一: 继承Thread 相当简单...\n重写run方法即可\npublic class TRunnbale extends Thread{ public static void main(String[] args) { TRunnbale tRunnbale = new TRunnbale(); tRunnbale.start(); } @Override public void run() { System.out.println(&#34;我要跑线程了&#34;); } } 二:实现Runnable接口 这个是最简单的方式,直接实现Runnable接口 然后实现run()方法\n最后放入 new Thread()中,然后 start()执行就行\npublic class TRunnbale { public static void main(String[] args) { new Thread(new MyTask()).start(); } } class MyTask implements Runnable{ @Override public void run() { System.out.println(&#34;我要跑线程了!&#34;); } } 三: 实现Callable接口 这个接口里需要实现的那个方法,是有一个返回值的,然后可以完成每个线程结束后,返回一个参数,线程外部可以接受这个参数\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu13739649187745961479.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">fang7日常开发博客</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/">java创建线程的几种方式</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Nov 19, 2020</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 1 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="java创建线程的几种方式">java创建线程的几种方式
+</h1><h2 id="一-继承thread">一: 继承Thread
+</h2><p>相当简单...</p>
+<p>重写run方法即可</p>
+<pre tabindex="0"><code>public class TRunnbale extends Thread{
+    public static void main(String[] args) {
+        TRunnbale tRunnbale = new TRunnbale();
+        tRunnbale.start();
+    }
+    
+    @Override
+    public void run() {
+        System.out.println(&#34;我要跑线程了&#34;);
+    }
+}
+</code></pre><h2 id="二实现runnable接口">二:实现Runnable接口
+</h2><p>这个是最简单的方式,直接实现Runnable接口 然后实现run()方法</p>
+<p>最后放入 new Thread()中,然后 start()执行就行</p>
+<pre tabindex="0"><code>public class TRunnbale {
+    public static void main(String[] args) {
+        new Thread(new MyTask()).start();
+    }
+}
+
+class MyTask implements Runnable{
+
+    @Override
+    public void run() {
+        System.out.println(&#34;我要跑线程了!&#34;);
+    }
+}
+</code></pre><h2 id="三-实现callable接口">三: 实现Callable接口
+</h2><p>这个接口里需要实现的那个方法,是有一个返回值的,然后可以完成每个线程结束后,返回一个参数,线程外部可以接受这个参数</p>
+<p><img src="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/e44d91252665822a8f2728bb7f6a568e82c8f1e7.png"
+	width="996"
+	height="474"
+	srcset="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/e44d91252665822a8f2728bb7f6a568e82c8f1e7_hu10240068550462458320.png 480w, /post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/e44d91252665822a8f2728bb7f6a568e82c8f1e7_hu3468852248760989844.png 1024w"
+	loading="lazy"
+	
+		alt="Callable接口"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="210"
+		data-flex-basis="504px"
+	
+></p>
+<pre tabindex="0"><code>public class TRunnbale extends Thread{
+    public static void main(String[] args) {
+        FutureTask&lt;String&gt; futureTask = new FutureTask(new MyTask());
+        new Thread(futureTask, &#34;线程A&#34;).start();
+        try {
+            String result = futureTask.get();
+            System.out.println(result);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+
+class MyTask implements Callable&lt;String&gt;{
+
+    @Override
+    public String call() throws Exception {
+        // Do something...
+        return &#34;线程结束!&#34;;
+    }
+}
+</code></pre><p>这里有一个FutureTask</p>
+<p>咱们看一下这个类的源码,首先这个类实现了RunnableFuture这个接口</p>
+<p>RunnableFuture这个接口 有继承了Runnable和Future</p>
+<p>Runnable都知道是什么,这个接口是为了可以在 new Thread()中传入,</p>
+<p>因为 Thread最终的start()方法就是执行run()方法中的代码</p>
+<p><img src="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/904ec4a8025da1191e57e4241bbdc93ee3c059e4.png"
+	width="660"
+	height="634"
+	srcset="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/904ec4a8025da1191e57e4241bbdc93ee3c059e4_hu3372801225350295341.png 480w, /post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/904ec4a8025da1191e57e4241bbdc93ee3c059e4_hu2689071294179682175.png 1024w"
+	loading="lazy"
+	
+		alt="image-20201027230941948"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="104"
+		data-flex-basis="249px"
+	
+></p>
+<p>到现在可能会迷惑
+Runnable不是没有返回值么,这个Future的返回值是怎么实现的呢,</p>
+<p>咱们看下FutureTask的源码</p>
+<p><img src="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/6c589495c27dfd6989856f8e1662db0d871c4955.png"
+	width="942"
+	height="354"
+	srcset="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/6c589495c27dfd6989856f8e1662db0d871c4955_hu9802346291250314316.png 480w, /post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/6c589495c27dfd6989856f8e1662db0d871c4955_hu16307387837413070085.png 1024w"
+	loading="lazy"
+	
+		alt="image-20201027234748316"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="266"
+		data-flex-basis="638px"
+	
+></p>
+<p><img src="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/da3042978707bd1747c1a52d00d685f183b89ad1.png"
+	width="1054"
+	height="1076"
+	srcset="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/da3042978707bd1747c1a52d00d685f183b89ad1_hu16040816811400122629.png 480w, /post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/da3042978707bd1747c1a52d00d685f183b89ad1_hu2376948487222219650.png 1024w"
+	loading="lazy"
+	
+		alt="image-20201027234618710"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="97"
+		data-flex-basis="235px"
+	
+></p>
+<p>Thread会调用run()方法,然后里边调用了<code>new FutureTask(new MyTask());</code></p>
+<p>里Callable的call()方法然后把这个值设置到当前对象的outcome参数上</p>
+<p><img src="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/792e2fb055d0d2bfe55a04a1762eb84ede1de80e.png"
+	width="1108"
+	height="440"
+	srcset="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/792e2fb055d0d2bfe55a04a1762eb84ede1de80e_hu18261985103733459225.png 480w, /post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/792e2fb055d0d2bfe55a04a1762eb84ede1de80e_hu10269348522028495762.png 1024w"
+	loading="lazy"
+	
+		alt="image-20201027234919762"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="251"
+		data-flex-basis="604px"
+	
+></p>
+<p>然后主线程调用FutureTask的对象的get()方法,获得outcome这个值</p>
+<p><img src="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/e8c151078a7525fbc6244abe3618ea3e37cf3108.png"
+	width="1050"
+	height="358"
+	srcset="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/e8c151078a7525fbc6244abe3618ea3e37cf3108_hu2085998572312797455.png 480w, /post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/e8c151078a7525fbc6244abe3618ea3e37cf3108_hu17792617899252745673.png 1024w"
+	loading="lazy"
+	
+		alt="image-20201027235213225"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="293"
+		data-flex-basis="703px"
+	
+></p>
+<p><img src="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/79a0b43ad438dec8a3f431385d0e019f2be183d0.png"
+	width="990"
+	height="460"
+	srcset="/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/79a0b43ad438dec8a3f431385d0e019f2be183d0_hu16762381944412974214.png 480w, /post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/79a0b43ad438dec8a3f431385d0e019f2be183d0_hu7358368129744882305.png 1024w"
+	loading="lazy"
+	
+		alt="image-20201027235228174"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="215"
+		data-flex-basis="516px"
+	
+></p>
+<p>当然get()方法会堵塞当前线程,一直到获取返回值后,再往后执行,</p>
+<p>(之后会整理一下FutureTask的相关知识,这里就不具体说了)</p>
+<h2 id="四使用java多线程来创建线程">四:使用java多线程来创建线程
+</h2><blockquote>
+<p>todo...</p>
+</blockquote>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 fang7日常开发博客
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.2e7ac20e639db4b8c03c1746c5f5e77276880ae83598ad087ed088084c28654b.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

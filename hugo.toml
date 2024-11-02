@@ -1,0 +1,5 @@
+baseURL = 'https://example.org/'
+languageCode = "en-us"
+defaultContentLanguage = "zh-cn"
+title = 'fang7日常开发博客'
+theme = 'hugo-theme-stack'
