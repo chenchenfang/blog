@@ -13,6 +13,8 @@
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2020-09-06T08:51:07&#43;08:00'/><meta property='article:modified_time' content='2020-09-06T08:51:07&#43;08:00'/>
 <meta name="twitter:title" content="单例模式-Java设计模式">
 <meta name="twitter:description" content="单例模式 一 : 枚举单例 java中的枚举,只会初始化一次,所以枚举可以直接实现单例,直接上代码吧很简单\npublic class Singleton { private Singleton() {} private enum EnumSingleton { INSTANCE; private Singleton singleton; EnumSingleton() { singleton = new Singleton(); } public Singleton getSingleton() { return singleton; } } public static Singleton getSingleton() { return EnumSingleton.INSTANCE.getSingleton(); } public static void main(String[] args) { Singleton singleton = Singleton.getSingleton(); System.out.println(singleton); } } 二 : 内部类单例 在类的内部,再声明一个静态类,在静态类里边初始化外部的那个类\npublic class SingletonInnerClass { private SingletonInnerClass() { } private static class Singleton { private static SingletonInnerClass singletonInnerClass = new SingletonInnerClass(); } public static SingletonInnerClass getInstance(){ return Singleton.singletonInnerClass; } } 第一次看这个类的时候,没有想明白为什么不直接在外部声明一个静态变量,现在想想应该是外部类SingletonInnerClass{.language-plaintext .highlighter-rouge}初始化的时候会把静态变量全都完成初始化,这样就不能实现延迟加载(只有真正用的时候才加载).\n">
+    <link rel="shortcut icon" href="/favicon.ico" />
+
     </head>
     <body class="
     article-page
@@ -56,7 +58,7 @@
                     
                     
                         
-                        <img src="/img/avatar_hu13739649187745961479.png" width="300"
+                        <img src="/img/avatar_hu9005595318015309411.png" width="300"
                             height="300" class="site-logo" loading="lazy" alt="Avatar">
                     
                 

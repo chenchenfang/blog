@@ -13,6 +13,8 @@
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2020-12-06T20:21:00&#43;08:00'/><meta property='article:modified_time' content='2020-12-06T20:21:00&#43;08:00'/>
 <meta name="twitter:title" content="Springboot中排除自动配置的 3 种方法">
 <meta name="twitter:description" content="Springboot中排除自动配置的 3 种方法 springboot中排除自动配置\n1.@SpringBootApplication 注解中去掉 import org.springframework.boot.SpringApplication; import org.springframework.boot.autoconfigure.SpringBootApplication; import org.springframework.boot.context.properties.bind.Bindable; import org.springframework.boot.context.properties.bind.Binder; import org.springframework.context.ConfigurableApplicationContext; @SpringBootApplication(exclude = {MyAppAutoConfiguration.class}) public class StartApplication { public static void main(String[] args) { ConfigurableApplicationContext run = SpringApplication.run(StartApplication.class, args); Binder binder = Binder.get(run.getEnvironment()); String s = binder.bind(&#34;myapp.company&#34;, Bindable.of(String.class)).get(); System.out.println(s); } } 2.@EnableAutoConfiguration注解中去掉 import org.springframework.boot.autoconfigure.EnableAutoConfiguration; import org.springframework.context.annotation.Configuration; @Configuration @EnableAutoConfiguration(exclude = {MyAppAutoConfiguration.class}) public class ConfigTest { } 3.配置文件中去掉 server: port: 8081 myapp: name: 嘿嘿嘿 company: 我是公司 spring: autoconfigure: exclude: - com.fang7.spring.boot.autoconfigure.MyAppAutoConfiguration ">
+    <link rel="shortcut icon" href="/favicon.ico" />
+
     </head>
     <body class="
     article-page
@@ -56,7 +58,7 @@
                     
                     
                         
-                        <img src="/img/avatar_hu13739649187745961479.png" width="300"
+                        <img src="/img/avatar_hu9005595318015309411.png" width="300"
                             height="300" class="site-logo" loading="lazy" alt="Avatar">
                     
                 

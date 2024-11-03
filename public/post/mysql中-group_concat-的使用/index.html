@@ -13,6 +13,8 @@
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2020-11-04T21:57:00&#43;08:00'/><meta property='article:modified_time' content='2020-11-04T21:57:00&#43;08:00'/>
 <meta name="twitter:title" content="mysql中 GROUP_CONCAT() 的使用">
 <meta name="twitter:description" content=" 最开始是让优化一个报表的SQL,因为时间太长了,然后看到join了一个表,这个表 是个group by ,然后select中使用了GROUP_CONCAT()\nSELECT place_id, GROUP_CONCAT( appname SEPARATOR &#39; &#39; ) appname, GROUP_CONCAT( appid SEPARATOR &#39; &#39; ) appid, type, CASE WHEN GROUP_CONCAT( appid SEPARATOR &#39;&#39; ) = &#39;&#39; THEN &#39;PC&#39; ELSE GROUP_CONCAT( platform SEPARATOR &#39; &#39; ) END AS platform FROM places_info GROUP BY place_id 这个SQL就用20秒,然后考虑做一个cache表,这样查起来就很快也很方便.\n做cache表用的是 insert into select ,\n然后报错\n1260 - Row 20094 was cut by GROUP_CONCAT(), Time: 0.153000s 查了一下说是,GROUP_CONCAT()最大允许结果长度默认是1024,这个值可以设置 group_concat_max_len\nSET global group_concat_max_len=15000; SET session group_concat_max_len=15000; 两种方式可以设置\n我选择的是session 只针对当次回话有效.然后再执行 insert into select{.language-plaintext .highlighter-rouge}就OK了\n">
+    <link rel="shortcut icon" href="/favicon.ico" />
+
     </head>
     <body class="
     article-page
@@ -56,7 +58,7 @@
                     
                     
                         
-                        <img src="/img/avatar_hu13739649187745961479.png" width="300"
+                        <img src="/img/avatar_hu9005595318015309411.png" width="300"
                             height="300" class="site-logo" loading="lazy" alt="Avatar">
                     
                 

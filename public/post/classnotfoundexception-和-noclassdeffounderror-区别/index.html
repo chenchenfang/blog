@@ -13,6 +13,8 @@
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2021-07-11T14:33:00&#43;08:00'/><meta property='article:modified_time' content='2021-07-11T14:33:00&#43;08:00'/>
 <meta name="twitter:title" content="ClassNotFoundException 和 NoClassDefFoundError 区别">
 <meta name="twitter:description" content="ClassNotFoundException 和 NoClassDefFoundError 1. ClassNotFoundException Class.forName(), ClassLoader.loadClass() or ClassLoader.findSystemClass() 一般是这几个方法,运行的时候会报错\n因为这个去加载不存在的类\n编译期间就没有这个类\npublic void givenNoDrivers_whenLoadDriverClass_thenClassNotFoundException() throws ClassNotFoundException { Class.forName(&#34;oracle.jdbc.driver.OracleDriver&#34;); } 2.NoClassDefFoundError 一般是因为类初始化 没有成功 因为类初始化只会初始化一次,第二次调用这个class 用于生成对象或者是静态变量,都会报错\n编译期间有这个类\npublic class ClassWithInitErrors { static int data = 1 / 0; } public class NoClassDefFoundErrorExample { public ClassWithInitErrors getClassWithInitErrors() { ClassWithInitErrors test; try { test = new ClassWithInitErrors(); } catch (Throwable t) { System.out.println(t); } test = new ClassWithInitErrors(); return test; } } @Test public void givenInitErrorInClass_whenloadClass_thenNoClassDefFoundError() { NoClassDefFoundErrorExample sample = new NoClassDefFoundErrorExample(); sample.getClassWithInitErrors(); } ">
+    <link rel="shortcut icon" href="/favicon.ico" />
+
     </head>
     <body class="
     article-page
@@ -56,7 +58,7 @@
                     
                     
                         
-                        <img src="/img/avatar_hu13739649187745961479.png" width="300"
+                        <img src="/img/avatar_hu9005595318015309411.png" width="300"
                             height="300" class="site-logo" loading="lazy" alt="Avatar">
                     
                 

@@ -13,6 +13,8 @@
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2020-09-26T19:18:07&#43;08:00'/><meta property='article:modified_time' content='2020-09-26T19:18:07&#43;08:00'/>
 <meta name="twitter:title" content="计算机的原码 反码 补码">
 <meta name="twitter:description" content="原码 反码 补码 一:为什么会有原码反码补码? 为了让计算机更简单的计算数值.所以计算机用补码\n具体怎么实现,后边会说,接下来先看一下 什么是原码 反码和补码\n二:正数的原码 反码 补码 网上大多都是按 原码 反码 补码 分别去介绍,博主(本人)感觉这样的方法并不方便理解.所以改用 正数和负数来说\n如果按int来的话,0太多了,看着不方便,就是8位来表示吧.\n正数就是 把十进制的数 变成二进制而已\n正数的原码 反码 补码是一样的{.language-plaintext .highlighter-rouge}\n[+1] = [00000001]（原码） = [00000001]（反码） = [00000001]（补码）\n三:负数的原码 反码 补码 原码:最高位为1{.language-plaintext .highlighter-rouge} 代表这个数是负数\n反码: 符号位不变{.language-plaintext .highlighter-rouge},其他位取反\n补码: 反码 + 1{.language-plaintext .highlighter-rouge}\n[-1] = [10000001]（原码） = [11111110]（反码） = [11111111]（补码）\n四:原码 反码 补码出现的意义 他们的出现都是为了让计算机计算的更加简单,从而性能更好.\n知识: 1 - 1 = 1 + (-1) 所以机器可以只有加法.\n首先如果只是原码计算,人可以很方便的计算出数值,因为人可以分清符号位.\n可是计算机想识别符号位,是很麻烦的.有什么方法能让计算机更简单的计算呢,于是就有了反码.\n">
+    <link rel="shortcut icon" href="/favicon.ico" />
+
     </head>
     <body class="
     article-page
@@ -56,7 +58,7 @@
                     
                     
                         
-                        <img src="/img/avatar_hu13739649187745961479.png" width="300"
+                        <img src="/img/avatar_hu9005595318015309411.png" width="300"
                             height="300" class="site-logo" loading="lazy" alt="Avatar">
                     
                 

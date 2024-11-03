@@ -13,6 +13,8 @@
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2023-01-09T22:49:00&#43;08:00'/><meta property='article:modified_time' content='2023-01-09T22:49:00&#43;08:00'/>
 <meta name="twitter:title" content="RocketMQ消息过大导致消费者消费不了,导致消息堆积">
 <meta name="twitter:description" content=" 周日的时候,突然消费者组就开始堆积了,然后临时解决方案想着重新起一个消费者组看看能不能恢复,然而并不能,无奈之下只能迁回使用redis作为消息中间件的方式,周一再细查一下\n1 遇到的报错以及现象 首先是看的是Dashboard,发现一会消费者组里边有一个消费者,一会没有\n其次就该去看消费者组的业务日志打印了,虽然在消费,但是很慢\n接下来就是看了消费组的RocketMQ日志打印,发现开始报错刷屏\n2023-01-08 12:26:45,649 WARN RocketmqClient - execute the pull request exception org.apache.rocketmq.client.exception.MQBrokerException: CODE: 24 DESC: the consumer&#39;s group info not exist See http://rocketmq.apache.org/docs/faq/ for further details. BROKER: 192.168.1.58:10911 at org.apache.rocketmq.client.impl.MQClientAPIImpl.processPullResponse(MQClientAPIImpl.java:803) at org.apache.rocketmq.client.impl.MQClientAPIImpl.access$200(MQClientAPIImpl.java:175) at org.apache.rocketmq.client.impl.MQClientAPIImpl$2.operationComplete(MQClientAPIImpl.java:754) at org.apache.rocketmq.remoting.netty.ResponseFuture.executeInvokeCallback(ResponseFuture.java:54) at org.apache.rocketmq.remoting.netty.NettyRemotingAbstract$2.run(NettyRemotingAbstract.java:321) at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539) at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136) at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635) at java.base/java.lang.Thread.run(Thread.java:833) 2023-01-08 12:26:45,649 WARN RocketmqClient - execute the pull request exception org.apache.rocketmq.client.exception.MQBrokerException: CODE: 24 DESC: the consumer&#39;s group info not exist See http://rocketmq.apache.org/docs/faq/ for further details. BROKER: 192.168.1.58:10911 at org.apache.rocketmq.client.impl.MQClientAPIImpl.processPullResponse(MQClientAPIImpl.java:803) at org.apache.rocketmq.client.impl.MQClientAPIImpl.access$200(MQClientAPIImpl.java:175) at org.apache.rocketmq.client.impl.MQClientAPIImpl$2.operationComplete(MQClientAPIImpl.java:754) at org.apache.rocketmq.remoting.netty.ResponseFuture.executeInvokeCallback(ResponseFuture.java:54) at org.apache.rocketmq.remoting.netty.NettyRemotingAbstract$2.run(NettyRemotingAbstract.java:321) at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539) at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136) at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635) at java.base/java.lang.Thread.run(Thread.java:833) 这个报错卡卡刷屏,于是乎只能去找RocketMQ的消费者client的源码了\n">
+    <link rel="shortcut icon" href="/favicon.ico" />
+
     </head>
     <body class="
     article-page
@@ -56,7 +58,7 @@
                     
                     
                         
-                        <img src="/img/avatar_hu13739649187745961479.png" width="300"
+                        <img src="/img/avatar_hu9005595318015309411.png" width="300"
                             height="300" class="site-logo" loading="lazy" alt="Avatar">
                     
                 

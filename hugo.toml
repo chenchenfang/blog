@@ -3,3 +3,9 @@ languageCode = "en-us"
 defaultContentLanguage = "zh-cn"
 title = 'fang7日常开发博客'
 theme = 'hugo-theme-stack'
+[Params]
+    favicon = '/favicon.ico'
+    [sidebar.avatar]
+        enabled = true
+        local = true
+        src = "img/avatar.png"
