@@ -23,7 +23,7 @@ pagination:
   pagerSize: 5
 
 languages:
-  ch:
+  en:
     languageName: "中文"
     weight: 1
     taxonomies:
