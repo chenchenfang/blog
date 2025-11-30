@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Posts | 我的博客</title>
+<meta name="keywords" content="">
+<meta name="description" content="Posts - 我的博客">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/post/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/post/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/post/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="我的博客 (Alt + H)">我的博客</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header">
+  <h1>
+    Posts
+  </h1>
+</header>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">多线程初始化类死锁
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>多线程初始化类死锁 前言 有一个MQ消费者程序,很久没有更新重启了,最近更新了代码,然后升级. 升级完之后看程序日志的打印,发现不往下走了,日志不动了,这个肯定不正常
+解决思路 碰到这种问题,需要查看两个数据,一个是jvm内存数据也就是dump出来的数据,还有就是当前程序调用情况. 由于程序是刚重启,内存的问题可能性不大,所以我使用jstack把当前程序堆栈调用情况输出到文件中. 接下来就是检查这个文件中的内容,卡着不动,肯定是有代码了,然后发现很多都是java.lang.Thread.State: RUNNABLE,具体看如下
+&#34;thread名称***&#34; #32 [27804] prio=5 os_prio=0 cpu=1379.98ms elapsed=362.77s tid=0x00007fdd6c8ec670 nid=27804 waiting on condition [0x00007fccf8d9b000] java.lang.Thread.State: RUNNABLE at staticdata.StaticDataLoad.loadCache(StaticDataLoad.java:129) - waiting on the Class initialization monitor for tools.Tool at staticdata.ExSystem.getCore_server_config(ExSystem.kt:1723) at staticdata.MediaDealIdInfo.init(MediaDealIdInfo.java:15) at staticdata.StaticDataLoad.&lt;init&gt;(StaticDataLoad.java:41) at staticdata.MediaDealIdInfo.&lt;init&gt;(MediaDealIdInfo.java:10) at staticdata.StaticData2.&lt;clinit&gt;(StaticData2.kt:452) ************************ at java.lang.Thread.runWith(java.base@21.0.1/Thread.java:1596) at java.lang.Thread.run(java.base@21.0.1/Thread.java:1583) &#34;ConsumeMessageThread_******_2&#34; #192 [27968] prio=5 os_prio=0 cpu=8.05ms elapsed=361.06s tid=0x00007fc9fc0025c0 nid=27968 waiting on condition [0x00007fcad01ec000] java.lang.Thread.State: RUNNABLE at bean.config.OkHttpConfig.&lt;init&gt;(OkHttpConfig.java:33) - waiting on the Class initialization monitor for staticdata.StaticData2 at tools.Tool.&lt;clinit&gt;(Tool.java:3779) org.apache.rocketmq.client.impl.consumer.ConsumeMessageConcurrentlyService$ConsumeRequest.run(ConsumeMessageConcurrentlyService.java:402) at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21.0.1/Executors.java:572) at java.util.concurrent.FutureTask.run(java.base@21.0.1/FutureTask.java:317) at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21.0.1/ThreadPoolExecutor.java:1144) at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21.0.1/ThreadPoolExecutor.java:642) at java.lang.Thread.runWith(java.base@21.0.1/Thread.java:1596) at java.lang.Thread.run(java.base@21.0.1/Thread.java:1583) 两个线程分别在等待对方类初始化完成,导致程序卡主不动了,由此就找到了原因
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-01-21 21:20:00 +0800 CST'>January 21, 2025</span></footer>
+  <a class="entry-link" aria-label="post link to 多线程初始化类死锁" href="http://localhost:1313/post/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%88%9D%E5%A7%8B%E5%8C%96%E7%B1%BB%E6%AD%BB%E9%94%81/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Okhttp发送请求卡住问题解决
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Okhttp发送请求卡住问题解决 我们有一个消费者组是发送请求用的,一直有一个问题是有时候会堆积,然后就不消费了,重启后就恢复了.…
+于是我让运维加了一个脚本,在堆积的时候触发这个脚本(dump出来文件),然后重启消费者组,先这样解决,等上班了再检查dump的文件
+于是乎就有了下边这个图里的内容,发现其他线程都在wait,只有一个在runing,然后看到堆栈信息卡在了这个方法,点进去查看这个是一个native方法,这个目前看是做不了什么了
+突然想到我们都是ipv4,这个是调用的ipv6的类,于是去查了资料发现可以在启动项上加-Djava.net.preferIPv4Stack=true{.language-plaintext .highlighter-rouge}来使用ipv4类,加上之后跑了一星期没有再出现之前的问题,问题解决
+</p>
+  </div>
+  <footer class="entry-footer"><span title='2024-04-18 20:16:00 +0800 CST'>April 18, 2024</span></footer>
+  <a class="entry-link" aria-label="post link to Okhttp发送请求卡住问题解决" href="http://localhost:1313/post/okhttp%E5%8F%91%E9%80%81%E8%AF%B7%E6%B1%82%E5%8D%A1%E4%BD%8F%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">IDEA 2024.1 版本提高流畅度方法
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>IDEA 2024.1 版本提高流畅度方法 {#idea-2024.1-%E7%89%88%E6%9C%AC%E6%8F%90%E9%AB%98%E6%B5%81%E7%95%85%E5%BA%A6%E6%96%B9%E6%B3%95 style=&#34;&#34;} 今天看IDEA出了2024.1 ,本着尝鲜的想法安装了
+正好前段时间测试了JDK21的分代ZGC,可以说基本就没有stop the world,这不都安装了新版本了,顺便修改一下运行的JDK版本和垃圾回收机制
+按两下shift ,然后输入runtime,选择红框这个
+然后会提示重启IDEA,重启完成后,开始修改垃圾回收为分代ZGC,打开修改框之后删除G1的开关,增加-XX:&#43;UseZGC -XX:&#43;ZGenerational 这两个参数,我顺便修改了-Xms2500m -Xmx2500m 最大最小堆内存,就不需要扩容了,也可以降低卡顿
+关于ZGC调优,经过我之前的测试,ZGC基本是不需要刻意调整的,如果非要调整加大堆内存量,就可以了.
+</p>
+  </div>
+  <footer class="entry-footer"><span title='2024-03-21 20:25:00 +0800 CST'>March 21, 2024</span></footer>
+  <a class="entry-link" aria-label="post link to IDEA 2024.1 版本提高流畅度方法" href="http://localhost:1313/post/idea-2024.1-%E7%89%88%E6%9C%AC%E6%8F%90%E9%AB%98%E6%B5%81%E7%95%85%E5%BA%A6%E6%96%B9%E6%B3%95/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">mysql连接数激增的问题解决过程
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p> 平时mysql连接数大概在2000左右,会不定时随机的突然增加到5000,这个事情就很恐怖,所以需要查出来连接数增加的原因
+分析与定位问题 {#%E5%88%86%E6%9E%90%E4%B8%8E%E5%AE%9A%E4%BD%8D%E9%97%AE%E9%A2%98 tabindex=&#34;-1&#34;} 分析现有的监控和数据 {#%E5%88%86%E6%9E%90%E7%8E%B0%E6%9C%89%E7%9A%84%E7%9B%91%E6%8E%A7%E5%92%8C%E6%95%B0%E6%8D%AE tabindex=&#34;-1&#34;} 连接数 5000的报警钉钉信息 当连接数5000的时候,数据库里当前连接正在执行的状态 SELECT `id`,`user`,`host`,`db`,`command`,`time`,`state`,`info` FROM information_schema.processlist 分析第二个的数据,看到连接基本都在sleep,很少有正在执行的,由于连接数据库是通过内网代理连接的,所以不能直接看出来哪个或者哪些机器导致了这个问题
+增加新的监控 {#%E5%A2%9E%E5%8A%A0%E6%96%B0%E7%9A%84%E7%9B%91%E6%8E%A7 tabindex=&#34;-1&#34;} 要定位哪里的问题就需要知道哪个程序或者哪个机器导致的,一步一步深入查,现在连哪个机器导致的问题都不知道,没办法去查,幸运的是这个问题是可以重现的,不必纠结过去没有数据,创造出新的数据再定位问题就行.
+在这里就想到了netstat{.language-plaintext .highlighter-rouge}命令,这个可以在代理机器上执行,查看哪些IP连接了mysql代理服务,并统计个数,于是就把这个命令的触发加到了发送钉钉报警的程序里.
+到这里又想到了一个问题,异常数据有了之后,没有正常的数据做对比还是定位不出来问题,所以增加了每分钟执行一次来保存正常数据用于做对比.
+分析新监控数据 {#%E5%88%86%E6%9E%90%E6%96%B0%E7%9B%91%E6%8E%A7%E6%95%B0%E6%8D%AE tabindex=&#34;-1&#34;} 等了1天终于等到了这个报警出现,对比平时的数据来说按连接数倒序,可以看到前边的大多数ip连接数都增加了,问了一下运维这些机器上都有哪些服务,被告知都是线上的tomcat服务.
+到这里总算有了一些进展,但是到了这里又遇到问题了,tomcat里边虽然只有一个项目,但是这个项目中代码量很大,review代码是看不出来也没有办法都review一遍,有什么办法可以定位什么业务创建了连接呢?
+之前读过一遍arthas的文档,对大概的命令以及功能有所了解,于是就想到了 stack{target=&#34;_blank&#34;} 这个命令,这个命令可以打印当前方法的调用堆栈信息,因为创建连接是必须new对象,那么监控这个new对象时候必须调用的方法就可以定位到具体的代码.
+因为这个是随机性的bug,那么靠人手动执行是看不出问题的,于是使用了arthas提供的任务后台执行的方法,后台任务最多执行1天,同时需要指定抓取多少条堆栈信息.
+之前没用过arthas,只是看文档知道执行stack会影响性能,但是具体影响多少性能并不清楚,这里找了一台线上tomcat手动执行stack,并观察了超时情况,超时只增加了0.5%,这个值可以接受,于是就开始后台执行了
+等待新的监控数据 {#%E7%AD%89%E5%BE%85%E6%96%B0%E7%9A%84%E7%9B%91%E6%8E%A7%E6%95%B0%E6%8D%AE tabindex=&#34;-1&#34;} 等啊等,终于等到了报警,查看对应时间的连接创建堆栈信息,问题出在缓存读取的方法上.
+如果缓存没有就会读取数据库,同一时间突然有很多都去查询数据库了,原因是缓存里没有对应的数据了,缓存是一个concurrenthashmap,直接做的替换,而同时这个map会根据实际情况增加数据进入,由此可以判断是新加的那部分数据,缓存替换的时候消失了.
+思考解决方案 {#%E6%80%9D%E8%80%83%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88 tabindex=&#34;-1&#34;} 缓存直接做替换是不行的,会丢失新加入的数据,那首先想到的是更新数据,更新数据会有一个问题是按之前逻辑新增加的那部分数据就会一直存在,内存也会越占用越多,所以需要有删除过期数据的程序,那么问题又来了,这个不好写,就算写了也不好维护.
+这里就想到了Caffeine缓存框架,当真是很强大的本地内存缓存的框架,可以设置多久没有访问就会过期,也支持更新操作,对于我这个需求来说简直完美.
+到了这里这个问题就算解决了,修改代码不过半小时的事情,主要的问题还是如何定位出来哪里代码有问题,
+</p>
+  </div>
+  <footer class="entry-footer"><span title='2023-12-30 21:32:00 +0800 CST'>December 30, 2023</span></footer>
+  <a class="entry-link" aria-label="post link to mysql连接数激增的问题解决过程" href="http://localhost:1313/post/mysql%E8%BF%9E%E6%8E%A5%E6%95%B0%E6%BF%80%E5%A2%9E%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E8%BF%87%E7%A8%8B/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">OkHttp优化过程记录
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p> 近期查看有请求下游系统超时,按百分比的话是0.8%的样子,但是每天量很大,超时总数不到1亿次,如果这个可以优化一点,提升巨大的
+1.整体的探索过程 目前只知道最终结果是超时,但是是不是哪里代码写的有问题从而导致的超时,还需要去定位
+1.1初步定为问题 首先记录两个时间,第一个是请求一进来一直到拼接发送请求的位置这段代码的,第二个是拼接请求一直到Response(或者超时了)这段代码的时间
+超时情况:
+不超时情况:
+从图上来看,不管是超时和不超时都第一个时间都不长,所以是拼接请求到接受Response的时候引起的超时
+1.2更细化的定位问题 现在知道是和发送请求有关系了,那么应该对于这部分代码增加详细的记录,来分析问题
+OkHttp监控与调优查资料的时候看到这个文章写的不错
+经过一番查找资料,okhttp有一个EventListener,可以记录发送请求的各个步骤的时间
+于是就有了下边的代码
+public class PrintingEventListener extends EventListener { @Override public void requestBodyEnd(@NotNull Call call, long byteCount) { printEvent(&#34;requestBodyEnd&#34;); } @Override public void requestBodyStart(@NotNull Call call) { printEvent(&#34;requestBodyStart&#34;); } @Override public void responseBodyEnd(@NotNull Call call, long byteCount) { printEvent(&#34;responseBodyEnd&#34;); } @Override public void responseBodyStart(@NotNull Call call) { printEvent(&#34;responseBodyStart&#34;); } @Override public void responseHeadersEnd(@NotNull Call call, @NotNull Response response) { printEvent(&#34;responseHeadersEnd&#34;); } @Override public void responseHeadersStart(@NotNull Call call) { printEvent(&#34;responseHeadersStart&#34;); } public static final Factory FACTORY = new Factory() { @Override public EventListener create(Call call) { //唯一标识 String randAllString = Format.getRandAllString(10); Random random = new Random(randAllString.hashCode()); double nextDouble = random.nextDouble(); //是tanx 与 10%的概率 if(call.request().url().toString().equals(&#34;xxx&#34;) &amp;&amp; nextDouble * 100 &lt;= 10){ InitServlet.okhttpTimeLog.plus(randAllString,&#34;startSend&#34;,0L,&#34;&#34;); //System.out.printf(&#34;%s %s%n&#34;, randAllString, call.request().url()); return new PrintingEventListener(randAllString, System.nanoTime()); }else{ return EventListener.NONE; } } }; final String callId; final long callStartNanos; public PrintingEventListener(String callId, long callStartNanos) { this.callId = callId; this.callStartNanos = callStartNanos; } private void printEvent(String name) { long elapsedNanos = System.nanoTime() - callStartNanos; InitServlet.okhttpTimeLog.plus(callId,name,elapsedNanos / 1000000L,&#34;&#34;); //System.out.printf(&#34;%s %.0fms %s%n&#34;, callId, elapsedNanos / 1000000d, name); } private void printEvent(String name,IOException ioe){ long elapsedNanos = System.nanoTime() - callStartNanos; InitServlet.okhttpTimeLog.plus(callId,name,elapsedNanos / 1000000L,ioe.getMessage()); //System.out.printf(&#34;%s %.0fms %s %s%n&#34;, callId, elapsedNanos / 1000000d, name,ioe.getMessage()); } @Override public void callStart(Call call) { printEvent(&#34;callStart&#34;); } @Override public void dnsStart(Call call, String domainName) { printEvent(&#34;dnsStart&#34;); } @Override public void dnsEnd(Call call, String domainName, List&lt;InetAddress&gt; inetAddressList) { printEvent(&#34;dnsEnd&#34;); } @Override public void connectStart(Call call, InetSocketAddress inetSocketAddress, Proxy proxy) { printEvent(&#34;connectStart&#34;); } @Override public void secureConnectStart(Call call) { printEvent(&#34;secureConnectStart&#34;); } @Override public void secureConnectEnd(Call call, @Nullable Handshake handshake) { printEvent(&#34;secureConnectEnd&#34;); } @Override public void connectEnd(Call call, InetSocketAddress inetSocketAddress, Proxy proxy, @Nullable Protocol protocol) { printEvent(&#34;connectEnd&#34;); } @Override public void connectFailed(Call call, InetSocketAddress inetSocketAddress, Proxy proxy, @Nullable Protocol protocol, IOException ioe) { printEvent(&#34;connectFailed&#34;); } @Override public void connectionAcquired(Call call, Connection connection) { printEvent(&#34;connectionAcquired&#34;); } @Override public void requestHeadersStart(Call call) { printEvent(&#34;requestHeadersStart&#34;); } @Override public void requestHeadersEnd(Call call, Request request) { printEvent(&#34;requestHeadersEnd&#34;); } @Override public void connectionReleased(Call call, Connection connection) { printEvent(&#34;connectionReleased&#34;); } @Override public void requestFailed(Call call, IOException ioe) { printEvent(&#34;requestFailed&#34;,ioe); } @Override public void responseFailed(Call call, IOException ioe) { printEvent(&#34;responseFailed&#34;,ioe); } @Override public void callFailed(Call call, IOException ioe) { printEvent(&#34;callFailed&#34;,ioe); } @Override public void callEnd(Call call) { printEvent(&#34;callEnd&#34;); } } 这个是记录的结果,这里只放一条数据了,可以明显看出来仅仅是等待Response的时候超时
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2023-10-14 10:06:00 +0800 CST'>October 14, 2023</span></footer>
+  <a class="entry-link" aria-label="post link to OkHttp优化过程记录" href="http://localhost:1313/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">RocketMQ消息过大导致消费者消费不了,导致消息堆积
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p> 周日的时候,突然消费者组就开始堆积了,然后临时解决方案想着重新起一个消费者组看看能不能恢复,然而并不能,无奈之下只能迁回使用redis作为消息中间件的方式,周一再细查一下
+1 遇到的报错以及现象 首先是看的是Dashboard,发现一会消费者组里边有一个消费者,一会没有
+其次就该去看消费者组的业务日志打印了,虽然在消费,但是很慢
+接下来就是看了消费组的RocketMQ日志打印,发现开始报错刷屏
+2023-01-08 12:26:45,649 WARN RocketmqClient - execute the pull request exception org.apache.rocketmq.client.exception.MQBrokerException: CODE: 24 DESC: the consumer&#39;s group info not exist See http://rocketmq.apache.org/docs/faq/ for further details. BROKER: 192.168.1.58:10911 at org.apache.rocketmq.client.impl.MQClientAPIImpl.processPullResponse(MQClientAPIImpl.java:803) at org.apache.rocketmq.client.impl.MQClientAPIImpl.access$200(MQClientAPIImpl.java:175) at org.apache.rocketmq.client.impl.MQClientAPIImpl$2.operationComplete(MQClientAPIImpl.java:754) at org.apache.rocketmq.remoting.netty.ResponseFuture.executeInvokeCallback(ResponseFuture.java:54) at org.apache.rocketmq.remoting.netty.NettyRemotingAbstract$2.run(NettyRemotingAbstract.java:321) at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539) at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136) at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635) at java.base/java.lang.Thread.run(Thread.java:833) 2023-01-08 12:26:45,649 WARN RocketmqClient - execute the pull request exception org.apache.rocketmq.client.exception.MQBrokerException: CODE: 24 DESC: the consumer&#39;s group info not exist See http://rocketmq.apache.org/docs/faq/ for further details. BROKER: 192.168.1.58:10911 at org.apache.rocketmq.client.impl.MQClientAPIImpl.processPullResponse(MQClientAPIImpl.java:803) at org.apache.rocketmq.client.impl.MQClientAPIImpl.access$200(MQClientAPIImpl.java:175) at org.apache.rocketmq.client.impl.MQClientAPIImpl$2.operationComplete(MQClientAPIImpl.java:754) at org.apache.rocketmq.remoting.netty.ResponseFuture.executeInvokeCallback(ResponseFuture.java:54) at org.apache.rocketmq.remoting.netty.NettyRemotingAbstract$2.run(NettyRemotingAbstract.java:321) at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539) at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264) at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136) at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635) at java.base/java.lang.Thread.run(Thread.java:833) 这个报错卡卡刷屏,于是乎只能去找RocketMQ的消费者client的源码了
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2023-01-09 22:49:00 +0800 CST'>January 9, 2023</span></footer>
+  <a class="entry-link" aria-label="post link to RocketMQ消息过大导致消费者消费不了,导致消息堆积" href="http://localhost:1313/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">java.lang.NoSuchFieldError 报错解决方法
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>java.lang.NoSuchFieldError 报错排查问题 排查过程 报这个错的根本原因是运行时找不到对应的变量,那么为什么会找不到呢,因为运行的时候使用了错误的类 为什么会使用错误的类呢,是因为使用了错误版本的jar包 怎么会使用到错误的jar包呢 明明编译的时候好好的
+我这个跟业务有点关系,对接别人的sdk,他们文档中写的是把5个jar包上传到自己的maven私服,然后项目中就可以使用了,最开始以为是他们自己的私有的jar,后来发现不是这样,有开源项目的jar,bcprov-jdk15on这个加解密的包
+上传到私库的时候,使用了跟开源库不同的groupId,导致打出来的包里有两个不同版本的相同jar包,导致运行时使用了错误的jar包的类 所以才会报这个错误 于是我把自己项目中的bcprov-jdk15on版本升级到了sdk给的版本,
+就可以正常运行了
+</p>
+  </div>
+  <footer class="entry-footer"><span title='2022-06-30 23:35:00 +0800 CST'>June 30, 2022</span></footer>
+  <a class="entry-link" aria-label="post link to java.lang.NoSuchFieldError 报错解决方法" href="http://localhost:1313/post/java.lang.nosuchfielderror-%E6%8A%A5%E9%94%99%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Linux下的atime mtime ctime查看以及修改
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>1.三个时间的含义 {#1.%E4%B8%89%E4%B8%AA%E6%97%B6%E9%97%B4%E7%9A%84%E5%90%AB%E4%B9%89 tabindex=&#34;-1&#34;} access time （atime）
+当&#34;该文件的内容被取用&#34;时，就会更新这个读取时间 （access）。 modification time （mtime）
+当该文件的&#34;内容数据&#34;变更时，就会更新这个时间，内容数据指的是文件的内容，而不是文件的属性或权限。 status time （ctime）
+当该文件的&#34;状态 （status）“改变时，就会更新这个时间。
+举例来说，像是权限与属性被更改了，文件内容修改，都会修改这个时间。 2.查看这三个时间的命令 {#2.%E6%9F%A5%E7%9C%8B%E8%BF%99%E4%B8%89%E4%B8%AA%E6%97%B6%E9%97%B4%E7%9A%84%E5%91%BD%E4%BB%A4 tabindex=&#34;-1”} 1.stat命令 {#1.stat%E5%91%BD%E4%BB%A4 tabindex=&#34;-1&#34;} [root@agent-54 ~]# stat a.txt File: &#34;a.txt&#34; Size: 0 Blocks: 0 IO Block: 4096 普通空文件 Device: fd01h/64769d Inode: 394816 Links: 1 Access: (0644/-rw-r--r--) Uid: ( 0/ root) Gid: ( 0/ root) Access: 2021-01-01 01:01:00.000000000 &#43;0800 Modify: 2021-01-01 01:01:00.000000000 &#43;0800 Change: 2022-04-18 21:50:49.546704098 &#43;0800 里边三个时间分别对应介绍的三个时间
+2.ls查看 {#2.ls%E6%9F%A5%E7%9C%8B tabindex=&#34;-1&#34;} [root@agent-54 ~]# ls --full-time --time=atime a.txt -rw-r--r-- 1 root root 0 2021-01-01 01:01:00.000000000 &#43;0800 a.txt [root@agent-54 ~]# ls --full-time a.txt -rw-r--r-- 1 root root 0 2021-01-01 01:01:00.000000000 &#43;0800 a.txt [root@agent-54 ~]# ls --full-time --time=ctime a.txt -rw-r--r-- 1 root root 0 2022-04-18 21:50:49.546704098 &#43;0800 a.txt 3.touch修改access time和modification time {#3.touch%E4%BF%AE%E6%94%B9access-time%E5%92%8Cmodification-time tabindex=&#34;-1&#34;} ctime是修改不了的，它是随着另外两个时间的变化而变化
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2022-04-18 22:27:00 +0800 CST'>April 18, 2022</span></footer>
+  <a class="entry-link" aria-label="post link to Linux下的atime mtime ctime查看以及修改" href="http://localhost:1313/post/linux%E4%B8%8B%E7%9A%84atime-mtime-ctime%E6%9F%A5%E7%9C%8B%E4%BB%A5%E5%8F%8A%E4%BF%AE%E6%94%B9/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">ClassNotFoundException 和 NoClassDefFoundError 区别
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>ClassNotFoundException 和 NoClassDefFoundError 1. ClassNotFoundException Class.forName(), ClassLoader.loadClass() or ClassLoader.findSystemClass() 一般是这几个方法,运行的时候会报错
+因为这个去加载不存在的类
+编译期间就没有这个类
+public void givenNoDrivers_whenLoadDriverClass_thenClassNotFoundException() throws ClassNotFoundException { Class.forName(&#34;oracle.jdbc.driver.OracleDriver&#34;); } 2.NoClassDefFoundError 一般是因为类初始化 没有成功 因为类初始化只会初始化一次,第二次调用这个class 用于生成对象或者是静态变量,都会报错
+编译期间有这个类
+public class ClassWithInitErrors { static int data = 1 / 0; } public class NoClassDefFoundErrorExample { public ClassWithInitErrors getClassWithInitErrors() { ClassWithInitErrors test; try { test = new ClassWithInitErrors(); } catch (Throwable t) { System.out.println(t); } test = new ClassWithInitErrors(); return test; } } @Test public void givenInitErrorInClass_whenloadClass_thenNoClassDefFoundError() { NoClassDefFoundErrorExample sample = new NoClassDefFoundErrorExample(); sample.getClassWithInitErrors(); } </p>
+  </div>
+  <footer class="entry-footer"><span title='2021-07-11 14:33:00 +0800 CST'>July 11, 2021</span></footer>
+  <a class="entry-link" aria-label="post link to ClassNotFoundException 和 NoClassDefFoundError 区别" href="http://localhost:1313/post/classnotfoundexception-%E5%92%8C-noclassdeffounderror-%E5%8C%BA%E5%88%AB/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">spring MVC 校验Get请求的参数
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>spring MVC 校验Get请求的参数 很多时候都是使用 POST请求然后传入请求体，用类来接受请求数据，但有时候就只有一个参数，不想去创建类了，然后也想使用校验注解去校验这个参数，那么接下来会介绍这种方法。
+//在类上声明注解 @Validated 下方的参数可以直接使用 校验注解 进行校验 @Validated public class UserAdminController { public JsonResult generatePortalJwtTokenByAdminGroupId( @NotNull Integer adminGroupId) throws CybercloudException { } } </p>
+  </div>
+  <footer class="entry-footer"><span title='2021-05-16 07:22:00 +0800 CST'>May 16, 2021</span></footer>
+  <a class="entry-link" aria-label="post link to spring MVC 校验Get请求的参数" href="http://localhost:1313/post/spring-mvc-%E6%A0%A1%E9%AA%8Cget%E8%AF%B7%E6%B1%82%E7%9A%84%E5%8F%82%E6%95%B0/"></a>
+</article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="next" href="http://localhost:1313/post/page/2/">Next&nbsp;&nbsp;»
+    </a>
+  </nav>
+</footer>
+    </main>
+    
+<footer class="footer">
+        <span>© <a href="https://github.com/adityatelange/hugo-PaperMod/graphs/contributors">PaperMod Contributors</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

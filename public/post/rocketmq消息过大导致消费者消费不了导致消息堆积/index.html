@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>RocketMQ消息过大导致消费者消费不了,导致消息堆积 | 我的博客</title>
+<meta name="keywords" content="">
+<meta name="description" content="
+周日的时候,突然消费者组就开始堆积了,然后临时解决方案想着重新起一个消费者组看看能不能恢复,然而并不能,无奈之下只能迁回使用redis作为消息中间件的方式,周一再细查一下
+
+1 遇到的报错以及现象
+首先是看的是Dashboard,发现一会消费者组里边有一个消费者,一会没有
+
+其次就该去看消费者组的业务日志打印了,虽然在消费,但是很慢
+接下来就是看了消费组的RocketMQ日志打印,发现开始报错刷屏
+2023-01-08 12:26:45,649 WARN RocketmqClient - execute the pull request exception
+org.apache.rocketmq.client.exception.MQBrokerException: CODE: 24  DESC: the consumer&#39;s group info not exist
+See http://rocketmq.apache.org/docs/faq/ for further details. BROKER: 192.168.1.58:10911
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl.processPullResponse(MQClientAPIImpl.java:803)
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl.access$200(MQClientAPIImpl.java:175)
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl$2.operationComplete(MQClientAPIImpl.java:754)
+        at org.apache.rocketmq.remoting.netty.ResponseFuture.executeInvokeCallback(ResponseFuture.java:54)
+        at org.apache.rocketmq.remoting.netty.NettyRemotingAbstract$2.run(NettyRemotingAbstract.java:321)
+        at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+        at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+        at java.base/java.lang.Thread.run(Thread.java:833)
+
+2023-01-08 12:26:45,649 WARN RocketmqClient - execute the pull request exception
+org.apache.rocketmq.client.exception.MQBrokerException: CODE: 24  DESC: the consumer&#39;s group info not exist
+See http://rocketmq.apache.org/docs/faq/ for further details. BROKER: 192.168.1.58:10911
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl.processPullResponse(MQClientAPIImpl.java:803)
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl.access$200(MQClientAPIImpl.java:175)
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl$2.operationComplete(MQClientAPIImpl.java:754)
+        at org.apache.rocketmq.remoting.netty.ResponseFuture.executeInvokeCallback(ResponseFuture.java:54)
+        at org.apache.rocketmq.remoting.netty.NettyRemotingAbstract$2.run(NettyRemotingAbstract.java:321)
+        at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+        at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+        at java.base/java.lang.Thread.run(Thread.java:833)
+这个报错卡卡刷屏,于是乎只能去找RocketMQ的消费者client的源码了">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="我的博客 (Alt + H)">我的博客</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      RocketMQ消息过大导致消费者消费不了,导致消息堆积
+    </h1>
+    <div class="post-meta"><span title='2023-01-09 22:49:00 +0800 CST'>January 9, 2023</span>
+
+</div>
+  </header> 
+  <div class="post-content"><blockquote>
+<p>周日的时候,突然消费者组就开始堆积了,然后临时解决方案想着重新起一个消费者组看看能不能恢复,然而并不能,无奈之下只能迁回使用redis作为消息中间件的方式,周一再细查一下</p>
+</blockquote>
+<h2 id="1-遇到的报错以及现象">1 遇到的报错以及现象<a hidden class="anchor" aria-hidden="true" href="#1-遇到的报错以及现象">#</a></h2>
+<p>首先是看的是Dashboard,发现一会消费者组里边有一个消费者,一会没有<br>
+<img alt="image" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/867497dc6749769319ea72912069a26fdc708319.png">
+其次就该去看消费者组的业务日志打印了,虽然在消费,但是很慢<br>
+接下来就是看了消费组的RocketMQ日志打印,发现开始报错刷屏</p>
+<pre tabindex="0"><code>2023-01-08 12:26:45,649 WARN RocketmqClient - execute the pull request exception
+org.apache.rocketmq.client.exception.MQBrokerException: CODE: 24  DESC: the consumer&#39;s group info not exist
+See http://rocketmq.apache.org/docs/faq/ for further details. BROKER: 192.168.1.58:10911
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl.processPullResponse(MQClientAPIImpl.java:803)
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl.access$200(MQClientAPIImpl.java:175)
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl$2.operationComplete(MQClientAPIImpl.java:754)
+        at org.apache.rocketmq.remoting.netty.ResponseFuture.executeInvokeCallback(ResponseFuture.java:54)
+        at org.apache.rocketmq.remoting.netty.NettyRemotingAbstract$2.run(NettyRemotingAbstract.java:321)
+        at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+        at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+        at java.base/java.lang.Thread.run(Thread.java:833)
+
+2023-01-08 12:26:45,649 WARN RocketmqClient - execute the pull request exception
+org.apache.rocketmq.client.exception.MQBrokerException: CODE: 24  DESC: the consumer&#39;s group info not exist
+See http://rocketmq.apache.org/docs/faq/ for further details. BROKER: 192.168.1.58:10911
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl.processPullResponse(MQClientAPIImpl.java:803)
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl.access$200(MQClientAPIImpl.java:175)
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl$2.operationComplete(MQClientAPIImpl.java:754)
+        at org.apache.rocketmq.remoting.netty.ResponseFuture.executeInvokeCallback(ResponseFuture.java:54)
+        at org.apache.rocketmq.remoting.netty.NettyRemotingAbstract$2.run(NettyRemotingAbstract.java:321)
+        at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+        at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+        at java.base/java.lang.Thread.run(Thread.java:833)
+</code></pre><p>这个报错卡卡刷屏,于是乎只能去找RocketMQ的消费者client的源码了</p>
+<h2 id="2-源码的追踪-2-e6ba90e7a081e79a84e8bfbde8b8aa-tabindex-1">2 源码的追踪 {#2-%E6%BA%90%E7%A0%81%E7%9A%84%E8%BF%BD%E8%B8%AA tabindex=&quot;-1&quot;}<a hidden class="anchor" aria-hidden="true" href="#2-源码的追踪-2-e6ba90e7a081e79a84e8bfbde8b8aa-tabindex-1">#</a></h2>
+<h3 id="21-消费者client端源码-21-e6b688e8b4b9e88085cliente7abafe6ba90e7a081-tabindex-1">2.1 消费者client端源码 {#2.1-%E6%B6%88%E8%B4%B9%E8%80%85client%E7%AB%AF%E6%BA%90%E7%A0%81 tabindex=&quot;-1&quot;}<a hidden class="anchor" aria-hidden="true" href="#21-消费者client端源码-21-e6b688e8b4b9e88085cliente7abafe6ba90e7a081-tabindex-1">#</a></h3>
+<p><code>org.apache.rocketmq.client.impl.MQClientAPIImpl.processPullResponse(MQClientAPIImpl.java:803)</code>{.language-plaintext
+.highlighter-rouge}也就是这一行<br>
+<img alt="image-1673275379445" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/883f4989e9d65f9cff08cb65b9188eec6d1b8872.png">
+这看着应该是从broker端拉回来的数据有问题,不是正常能消费的数据,那就再往上层看看<code>RemotingCommand response</code>{.language-plaintext
+.highlighter-rouge}这个对象是怎么来的吧<br>
+<img alt="image-1673275399471" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/25c431a6376af2b6b48ce6a9a238d4ab031ab8cc.png">
+再往上一步点的话,会看到有两个地方一个是同步一个是异步,那看的话自然是看同步,毕竟同步代码更简单明了一些,最终的功能肯定是一样的,因为之前学了学netty以及知道RocketMQ是使用Netty通信的,所以看这个方法名字<code>this.remotingClient.invokeSync</code>{.language-plaintext
+.highlighter-rouge}大概能猜出来它是和broker端进行通信然后获取到要消费的消息,那么接着点进去<br>
+<img alt="image-1673275489367" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/f79dfabc78ccb47e7fac8c4e139fa89c90fa67cc.png">
+可以看到<code>response</code>{.language-plaintext
+.highlighter-rouge}对象是从这个方法<code>invokeSyncImpl</code>{.language-plaintext
+.highlighter-rouge}返回出来的,那就再进去看看<br>
+<img alt="image-1673317661463" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/06ea476476c01919bd51253362a58fa17fb09926.png">
+从这里看的话,并没有对这个对象做特殊的处理,这个时候一定有人有疑问,为什么他就是能正常返回呢,里边还有这么多的if,因为根据<code>CODE: 24 DESC: the consumer's group info not exist</code>{.language-plaintext
+.highlighter-rouge}<br>
+这个报错就能看出来,<code>response</code>对象一定是有的,并且顺利封装了,要不然不可能有这个报错打印,<br>
+消费者client的源码算是看完了,并没有发现有什么问题,而这个报错是broker端返回给消费者client的,那就去搜搜broker的源码里哪里有这个报错吧</p>
+<h3 id="22-broker端源码追踪">2.2 broker端源码追踪<a hidden class="anchor" aria-hidden="true" href="#22-broker端源码追踪">#</a></h3>
+<p>首先搜了一下这个报错的内容,<code>org.apache.rocketmq.broker.processor.PullMessageProcessor#processRequest(io.netty.channel.Channel, org.apache.rocketmq.remoting.protocol.RemotingCommand, boolean)</code>{.language-plaintext
+.highlighter-rouge}在这个方法的 178行<br>
+<img alt="image-1673275550621" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/25a834145650485b2393c99963f3983931af3b13.png">
+那这里就是<code>this.brokerController.getConsumerManager().getConsumerGroupInfo(requestHeader.getConsumerGroup());</code>{.language-plaintext
+.highlighter-rouge}返回的结果为null,点进去看看<br>
+<img alt="image-1673275560552" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/d3cd0a831e0359dc21ec60543f2ed42f7a7a4a50.png">
+发现是这个<code>consumerTable</code>{.language-plaintext
+.highlighter-rouge}取出来为null</p>
+<pre tabindex="0"><code>private final ConcurrentMap&lt;String/* Group */, ConsumerGroupInfo&gt; consumerTable =  
+    new ConcurrentHashMap&lt;String, ConsumerGroupInfo&gt;(1024);
+</code></pre><p>这个对象是一个ConcurrentMap,那如果取出来为null的话,肯定是没有这个key,也就是没有这个消费者组的信息,我明明启动了消费者组怎么可能没有呢,那肯定是在哪个地方给remove掉了,接下来查一下调用remove的方法都在哪里</p>
+<pre tabindex="0"><code>org.apache.rocketmq.broker.client.ConsumerManager#doChannelCloseEvent
+org.apache.rocketmq.broker.client.ConsumerManager#unregisterConsumer
+</code></pre><p>就是这两个方法的逻辑里有remove方法<br>
+查到这里我感觉需要看一下broker端的日志了<br>
+<img alt="image-1673275579595" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/28f6464de4902ef5c72df2f4ba75079cf183ddfb.png">
+这么多日志,从何看起呢,先挑着日志多的看吧,毕竟卡卡刷屏,肯定日志量大,文件也不小<br>
+这里的截图应该是已经归档过了的,现在broker.log才16M,记得出问题的时候100多M<br>
+先看<code>broker.log</code>{.language-plaintext .highlighter-rouge}吧<br>
+<img alt="image-1673275588102" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/436e3f0d493633e9a3d51b7bae183ca35178bfd7.png">
+我从茫茫的打印日志中找到了这个<br>
+看着大概就是说新创建了一个消费者组信息,然后直接就被删掉了<br>
+只有<code>NETTY EVENT: remove not active channel</code>{.language-plaintext
+.highlighter-rouge}这个是WARN,先查查这个在哪里报的吧<br>
+<img alt="image-1673275598072" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/acec26f1862b6470daf63481884bd8cedc520846.png">
+正好在<code>org.apache.rocketmq.broker.client.ConsumerManager#doChannelCloseEvent</code>{.language-plaintext
+.highlighter-rouge}<br>
+直接把<code>org.apache.rocketmq.broker.client.ConsumerManager#unregisterConsumer</code>{.language-plaintext
+.highlighter-rouge}这个排除了<br>
+那么这个方法的上一层就是<br>
+<img alt="image-1673275615179" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/12383f9abe4b7c55a16875f7a9cc41fcffdaf0be.png">
+<img alt="image-1673317524836" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/1a187f5039ebc5252bf4186874e6cb2a0f777df8.png">
+这些方法都是在一个run()方法里边跑的<br>
+<img alt="image-1673317579342" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/bfc8a9df5cb6217779984ae3eb2bd98c2cf7a825.png">
+看的出来<code>this.eventQueue</code>{.language-plaintext
+.highlighter-rouge}这个是存放NettyEvent的地方,而这三个方法都是从这里调用的<br>
+那就看什么地方会把NettyEvent放到eventQueue中<br>
+<img alt="image-1673275637210" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/07ef0c64f82bf055ddddb1cf1fa848789dc814a0.png">
+搜一下只有这个类中的<code>putNettyEvent</code>{.language-plaintext
+.highlighter-rouge}方法才会add<br>
+那再看看这个方法是从哪里调用的吧<br>
+<img alt="image-1673275644911" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/1034965014df54e2102ffb246a483c9cc5305996.png">
+一共有这么多地方调用,想来咱们看的是broker的代码,那肯定是server吧,那就锁定在这四个了<br>
+那也可以看到第一个type类型是<code>CONNECT</code>{.language-plaintext
+.highlighter-rouge}直接排除,剩下的三个,<br>
+分别都点进去看看,会发现这三个方法都伴随着日志打印<br>
+<img alt="image-1673275651482" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/1ae6af7c6736ee44c7f2df54533d45e8423f8d33.png">
+那咱们就去看看日志打印,然后定位出来具体是哪种事件导致了删除我的消费者组信息<br>
+这里就有个问题,server端那么多日志文件应该看哪个哇?<br>
+我想到了看下这个代码是在哪个包下<br>
+<img alt="image-1673275657915" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/0a52c9b14c2f27cb369fa14be28235f23254d92b.png">
+可以看到是remoting,那就看对应名字的log,此时打开消费者,观察日志<br>
+<img alt="image-1673275665371" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/1489559b99e23e383d9e933a1f788625788e54ae.png">
+可以看到Active之后,直接Inactive,那肯定是这个事件导致的<br>
+接下来搜这个日志打印,然后就会发现是触发了CLOSE事件<br>
+<img alt="image-1673275671584" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/3f5fe3828f4d0c7b3d0a921faad1efc8d4145bd4.png">
+看到这里就有点懵了,首先是CLOSE事件,这就说明是正常关闭,是因为客户端不活跃导致的,那怎么想都是客户端有问题哇</p>
+<h2 id="3-继续查看客户端日志">3 继续查看客户端日志<a hidden class="anchor" aria-hidden="true" href="#3-继续查看客户端日志">#</a></h2>
+<p>兜兜转转一圈,又回到了客户端日志,因为之前刷屏的都是<code>CODE: 24 DESC: the consumer's group info not exist</code>{.language-plaintext
+.highlighter-rouge},但是这个是WARN类型的日志,我突发奇想,搜搜ERROR看看,果然找到了真正的问题<br>
+<img alt="image-1673275683289" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/9992a2ab8a6898817fb2aac81d79fd346f5bf18e.png">
+这个东西熟啊,这个是Netty的一个解码类,如果消息太长的话会报错,那这个想来应该是消息太长,但是我的消息肯定不会超过1M哇,通过堆栈可以看到是<code>org.apache.rocketmq.remoting.netty.NettyDecoder.decode</code>这里报错的,<br>
+<img alt="image-1673317738849" loading="lazy" src="/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/5f3fa88d6cab4643de2c2f58584dc352dd618df2.png">
+报错的是42行,那这个就是说当前消息太大了,解码出了问题,我猜想是把多个消息包装成一个大的消息,然后消费者client在进行解包处理,因为我的消息可能存才接近1M的,然后我一次获取100个消息,这样合并的话肯定会超过这个<code>16777216</code>
+于是我在消费者启动上增加-Dcom.rocketmq.remoting.frameMaxLength=167772160,增加10倍看看,重新启动发现有效果,比之前好点了,起码不是刷屏报错了,但是还是不正常,偶尔还是有刷屏,Dashboard上也是一会有消费者一会没有,这样子还是不正常,那这样子的话只能把一次获取消息的个数减少了,于是我减少到了10,也就是这个参数<code>consumer.pullBatchSize = 10</code>
+到这里这个报错总算是没有了,以我目前的技术水平,算是解决了问题,但是还是没有找到问题出在哪里<br>
+<code>RemotingUtil.closeChannel(ctx.channel());</code>其中报错之后会调用这个关闭channel,估计是因为这个,具体之后再学习学习吧.</p>
+<h2 id="4-总结">4 总结<a hidden class="anchor" aria-hidden="true" href="#4-总结">#</a></h2>
+<p>通过这次的源码跟踪查问题,体会到了RocketMQ的消息真的不能太大,不然会出现各种各样奇怪的问题,但是我们业务那边的消息如果按一个一个发送那真的是太多了,只能是业务那边合并成一个消息,然后再批量发到MQ,这就导致了单个消息可能接近1M,同时消费者的话一次拉取消息也不能太多&hellip;毕竟太多也处理不过来,索性减低一下速度,也是没有问题的,问题解决了,接下来就是把生产的东西往MQ中迁移了,希望不会再有问题&hellip;</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>© <a href="https://github.com/adityatelange/hugo-PaperMod/graphs/contributors">PaperMod Contributors</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

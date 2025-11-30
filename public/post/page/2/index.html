@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Posts | 我的博客</title>
+<meta name="keywords" content="">
+<meta name="description" content="Posts - 我的博客">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/post/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/post/index.xml" title="rss">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/post/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body class="list" id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="我的博客 (Alt + H)">我的博客</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header">
+  <h1>
+    Posts
+  </h1>
+</header>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Java内存区域
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Java内存区域 首先看一下 Java 内存区域图:
+程序计数器 程序计数器是一块较小的内存空间,它可以看做是当前线程所执行的字节码的行号指示器.
+Java虚拟机的概念模型里,字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码执行.
+在多线程中,为了线程切换后能恢复到正确的执行位置,每条线程都需要有一个独立的程序计数器,各个线程之间计数器互不影响,独立存储,所以为&#34;线程私有&#34;的内存.
+Java虚拟机栈 Java虚拟机栈也是&#34;线程私有&#34;,声明周期与线程相同.
+Java虚拟机栈描述的是Java方法执行的内存模型
+每个方法被执行的时候,Java虚拟机都会创建一个栈帧用于存储局部变量表操作数栈 动态连接 方法出口等信息.
+每一个方法被调用直至执行完毕的过程,就对应着一个栈帧在虚拟机栈中从入栈到出栈的过程.
+一般会把内存分为 堆内存和栈内存, 这里说的栈内存就是指 Java虚拟机栈中的局部变量表
+局部变量表中 存放了这个方法运行时各种Java虚拟机基本数据类型(boolean byte char short int float long double),对象引用和returnAddress类型.
+这些数据类型的存储空间以局部变量槽(Slot)表示,其中long和double占用2个槽,其他占用1个槽,局部变量表所需的局部变量槽的数量在编译期间确定下来,一个槽的真正使用内存空间的多少,取决于具体虚拟机如何实现,可能是 32位也可能是64位
+</p>
+  </div>
+  <footer class="entry-footer"><span title='2021-03-22 08:02:07 +0800 CST'>March 22, 2021</span></footer>
+  <a class="entry-link" aria-label="post link to Java内存区域" href="http://localhost:1313/post/java%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">java 四舍五入问题
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>java 四舍五入问题 前两天,在工作中遇到了一个问题,公司运营说:&#34;我上传数据,没有给我四舍五入,是不是你程序有问题?&#34;.那我当时肯定是想程序都用这么长时间了...不能有问题吧. 但是还是说:&#34;把具体的问题数据,以及什么可以重现,都说一下&#34;,接下来是解决问题的心路历程.
+复现bug 问题数据已经有了,接下来就是如何重现这个问题.主要的问题代码就是下边
+long round = Math.round(Double.valueOf(&#34;150.795&#34;) * 100); System.out.println(round); 其中Double.valueOf(&#34;150.795&#34;){.language-plaintext .highlighter-rouge}没有问题,然后 做*100{.language-plaintext .highlighter-rouge}操作,这里结果就有问题了,结果是15079.499999999998{.language-plaintext .highlighter-rouge}.
+之前都说 double不准什么的,也没体会到,现在真的是体会到了......
+解决问题 最终是需要实现 四舍五入保留两位小数,那就去看BigDecimal{.language-plaintext .highlighter-rouge}这个吧,都说这个计算是准确的.
+private Double round(double f) { BigDecimal b = BigDecimal.valueOf(f); return b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue(); } 最终使用的是这个解决方案.
+但是这里也有个坑,就是传入的double最好是没有计算过的,不然也会出现上边 *100{.language-plaintext .highlighter-rouge}之后结果有问题
+一般来说界面填写数值,然后传入到后端获取都是 String{.language-plaintext .highlighter-rouge}类型的,直接调用方法就行,如果需要计算的话,用BigDecimal{.language-plaintext .highlighter-rouge}计算
+</p>
+  </div>
+  <footer class="entry-footer"><span title='2021-01-02 15:42:00 +0800 CST'>January 2, 2021</span></footer>
+  <a class="entry-link" aria-label="post link to java 四舍五入问题" href="http://localhost:1313/post/java-%E5%9B%9B%E8%88%8D%E4%BA%94%E5%85%A5%E9%97%AE%E9%A2%98/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">maven-shade-plugin 使用方法
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>maven-shade-plugin 使用方法 之所以发这个,是因为前段时间,spark项目打包,到服务器上之后,出现了不同版本jar包冲突的问题,然后使用了这个插件解决了问题.
+一: relocation的使用 因为服务器上的jar不能删除,也不能替换,但是我用的jar包也只能用和服务器上不同的版本.
+使用这个功能可以完美的解决这个问题
+&lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-shade-plugin&lt;/artifactId&gt; &lt;version&gt;3.2.2&lt;/version&gt; &lt;executions&gt; &lt;execution&gt; &lt;phase&gt;package&lt;/phase&gt; &lt;goals&gt; &lt;goal&gt;shade&lt;/goal&gt; &lt;/goals&gt; &lt;configuration&gt; &lt;relocations&gt; &lt;relocation&gt; &lt;!--原本的包名--&gt; &lt;pattern&gt;okhttp3&lt;/pattern&gt; &lt;!--要替换成的包名--&gt; &lt;shadedPattern&gt;fang7.okhttp3&lt;/shadedPattern&gt; &lt;/relocation&gt; &lt;/relocations&gt; &lt;/configuration&gt; &lt;/execution&gt; &lt;/executions&gt; &lt;/plugin&gt; 这样就可以解决包名冲突的问题
+二: artifactSet excludes 去掉依赖 &lt;plugin&gt; &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt; &lt;artifactId&gt;maven-shade-plugin&lt;/artifactId&gt; &lt;version&gt;3.2.2&lt;/version&gt; &lt;executions&gt; &lt;execution&gt; &lt;phase&gt;package&lt;/phase&gt; &lt;goals&gt; &lt;goal&gt;shade&lt;/goal&gt; &lt;/goals&gt; &lt;configuration&gt; &lt;artifactSet&gt; &lt;excludes&gt; &lt;exclude&gt;com.squareup.okhttp3:okhttp&lt;/exclude&gt; &lt;/excludes&gt; &lt;/artifactSet&gt; &lt;/configuration&gt; &lt;/execution&gt; &lt;/executions&gt; &lt;/plugin&gt; 将该工程依赖的部分 Jar 包 include/exclude 掉。
+</p>
+  </div>
+  <footer class="entry-footer"><span title='2021-01-01 21:14:00 +0800 CST'>January 1, 2021</span></footer>
+  <a class="entry-link" aria-label="post link to maven-shade-plugin 使用方法" href="http://localhost:1313/post/maven-shade-plugin-%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">java中 YYYY-MM-dd 格式化问题
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p> 为什么说这个呢,因为今天新入职的开发问了我一个问题 就是今天出现的bug,日期格式化出现了明年的时间
+当时并没有仔细看,由于之前用的还是 Date类(java8之后使用LocalDate类更好用),所以把LocalDate的一个代码复制给他了,试了试直接能用,也就没有管.
+然后第二天早晨看微信公众号的时候看有人发了一个 关于 YYYY-MM-dd的消息,然后点进去看了一下才知道应该使用 yyyy-MM-dd ,记录一下.
+String format = LocalDate.of(2020, 12, 27).format(DateTimeFormatter.ofPattern(&#34;YYYY-MM-dd&#34;)); System.out.println(&#34;YYYY-MM-dd:&#34;&#43;format); format = LocalDate.of(2020, 12, 27).format(DateTimeFormatter.ofPattern(&#34;yyyy-MM-dd&#34;)); System.out.println(&#34;yyyy-MM-dd:&#34;&#43;format); //输出的是 //YYYY-MM-dd:2021-12-27 //yyyy-MM-dd:2020-12-27 首先可以看源码
+周所在的年
+查了一下有这个说法:
+当天所在的周属于的年份，一周从周日开始，周六结束，只要本周跨年，那么这周就算入下一年
+总结: 用yyyy-MM-dd 就完事了
+</p>
+  </div>
+  <footer class="entry-footer"><span title='2020-12-30 20:57:00 +0800 CST'>December 30, 2020</span></footer>
+  <a class="entry-link" aria-label="post link to java中 YYYY-MM-dd 格式化问题" href="http://localhost:1313/post/java%E4%B8%AD-yyyy-mm-dd-%E6%A0%BC%E5%BC%8F%E5%8C%96%E9%97%AE%E9%A2%98/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Springboot中排除自动配置的 3 种方法
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Springboot中排除自动配置的 3 种方法 springboot中排除自动配置
+1.@SpringBootApplication 注解中去掉 import org.springframework.boot.SpringApplication; import org.springframework.boot.autoconfigure.SpringBootApplication; import org.springframework.boot.context.properties.bind.Bindable; import org.springframework.boot.context.properties.bind.Binder; import org.springframework.context.ConfigurableApplicationContext; @SpringBootApplication(exclude = {MyAppAutoConfiguration.class}) public class StartApplication { public static void main(String[] args) { ConfigurableApplicationContext run = SpringApplication.run(StartApplication.class, args); Binder binder = Binder.get(run.getEnvironment()); String s = binder.bind(&#34;myapp.company&#34;, Bindable.of(String.class)).get(); System.out.println(s); } } 2.@EnableAutoConfiguration注解中去掉 import org.springframework.boot.autoconfigure.EnableAutoConfiguration; import org.springframework.context.annotation.Configuration; @Configuration @EnableAutoConfiguration(exclude = {MyAppAutoConfiguration.class}) public class ConfigTest { } 3.配置文件中去掉 server: port: 8081 myapp: name: 嘿嘿嘿 company: 我是公司 spring: autoconfigure: exclude: - com.fang7.spring.boot.autoconfigure.MyAppAutoConfiguration </p>
+  </div>
+  <footer class="entry-footer"><span title='2020-12-06 20:21:00 +0800 CST'>December 6, 2020</span></footer>
+  <a class="entry-link" aria-label="post link to Springboot中排除自动配置的 3 种方法" href="http://localhost:1313/post/springboot%E4%B8%AD%E6%8E%92%E9%99%A4%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E7%9A%84-3-%E7%A7%8D%E6%96%B9%E6%B3%95/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">java创建线程的几种方式
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>java创建线程的几种方式 一: 继承Thread 相当简单...
+重写run方法即可
+public class TRunnbale extends Thread{ public static void main(String[] args) { TRunnbale tRunnbale = new TRunnbale(); tRunnbale.start(); } @Override public void run() { System.out.println(&#34;我要跑线程了&#34;); } } 二:实现Runnable接口 这个是最简单的方式,直接实现Runnable接口 然后实现run()方法
+最后放入 new Thread()中,然后 start()执行就行
+public class TRunnbale { public static void main(String[] args) { new Thread(new MyTask()).start(); } } class MyTask implements Runnable{ @Override public void run() { System.out.println(&#34;我要跑线程了!&#34;); } } 三: 实现Callable接口 这个接口里需要实现的那个方法,是有一个返回值的,然后可以完成每个线程结束后,返回一个参数,线程外部可以接受这个参数
+public class TRunnbale extends Thread{ public static void main(String[] args) { FutureTask&lt;String&gt; futureTask = new FutureTask(new MyTask()); new Thread(futureTask, &#34;线程A&#34;).start(); try { String result = futureTask.get(); System.out.println(result); } catch (InterruptedException e) { e.printStackTrace(); } catch (ExecutionException e) { e.printStackTrace(); } } } class MyTask implements Callable&lt;String&gt;{ @Override public String call() throws Exception { // Do something... return &#34;线程结束!&#34;; } } 这里有一个FutureTask
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2020-11-19 22:33:07 +0800 CST'>November 19, 2020</span></footer>
+  <a class="entry-link" aria-label="post link to java创建线程的几种方式" href="http://localhost:1313/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">sql 行变列 列变行
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p> sql行变列 列变行 总是忘记,还是记下来比较好
+行变列 CREATE TABLE tb_score( id INT(11) NOT NULL auto_increment, userid VARCHAR(20) NOT NULL COMMENT &#39;用户id&#39;, subject VARCHAR(20) COMMENT &#39;科目&#39;, score DOUBLE COMMENT &#39;成绩&#39;, PRIMARY KEY(id) )ENGINE = INNODB DEFAULT CHARSET = utf8; INSERT INTO tb_score(userid,subject,score) VALUES (&#39;001&#39;,&#39;语文&#39;,90); INSERT INTO tb_score(userid,subject,score) VALUES (&#39;001&#39;,&#39;数学&#39;,92); INSERT INTO tb_score(userid,subject,score) VALUES (&#39;001&#39;,&#39;英语&#39;,80); INSERT INTO tb_score(userid,subject,score) VALUES (&#39;002&#39;,&#39;语文&#39;,88); INSERT INTO tb_score(userid,subject,score) VALUES (&#39;002&#39;,&#39;数学&#39;,90); INSERT INTO tb_score(userid,subject,score) VALUES (&#39;002&#39;,&#39;英语&#39;,75.5); INSERT INTO tb_score(userid,subject,score) VALUES (&#39;003&#39;,&#39;语文&#39;,70); INSERT INTO tb_score(userid,subject,score) VALUES (&#39;003&#39;,&#39;数学&#39;,85); INSERT INTO tb_score(userid,subject,score) VALUES (&#39;003&#39;,&#39;英语&#39;,90); INSERT INTO tb_score(userid,subject,score) VALUES (&#39;003&#39;,&#39;政治&#39;,82); select userid, max(case `subject` when &#39;语文&#39; then score else 0 end ) as &#39;语文&#39;, max(case `subject` when &#39;数学&#39; then score else 0 end ) as &#39;数学&#39;, max(case `subject` when &#39;英语&#39; then score else 0 end ) as &#39;英语&#39; from tb_score group by userid 列变行 CREATE TABLE tb_score1( id INT(11) NOT NULL auto_increment, userid VARCHAR(20) NOT NULL COMMENT &#39;用户id&#39;, cn_score DOUBLE COMMENT &#39;语文成绩&#39;, math_score DOUBLE COMMENT &#39;数学成绩&#39;, en_score DOUBLE COMMENT &#39;英语成绩&#39;, po_score DOUBLE COMMENT &#39;政治成绩&#39;, PRIMARY KEY(id) )ENGINE = INNODB DEFAULT CHARSET = utf8; INSERT INTO tb_score1(userid,cn_score,math_score,en_score,po_score) VALUES (&#39;001&#39;,90,92,80,0); INSERT INTO tb_score1(userid,cn_score,math_score,en_score,po_score) VALUES (&#39;002&#39;,88,90,75.5,0); INSERT INTO tb_score1(userid,cn_score,math_score,en_score,po_score) VALUES (&#39;003&#39;,70,85,90,82); select userid,&#39;语文&#39; as &#39;subject&#39;,cn_score as &#39;score&#39; from tb_score1 group by userid union all select userid,&#39;数学&#39; as &#39;subject&#39;,math_score as &#39;score&#39; from tb_score1 group by userid union all select userid,&#39;英语&#39; as &#39;subject&#39;,en_score as &#39;score&#39; from tb_score1 group by userid </p>
+  </div>
+  <footer class="entry-footer"><span title='2020-11-06 21:04:00 +0800 CST'>November 6, 2020</span></footer>
+  <a class="entry-link" aria-label="post link to sql 行变列 列变行" href="http://localhost:1313/post/sql-%E8%A1%8C%E5%8F%98%E5%88%97-%E5%88%97%E5%8F%98%E8%A1%8C/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">mysql中 GROUP_CONCAT() 的使用
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p> 最开始是让优化一个报表的SQL,因为时间太长了,然后看到join了一个表,这个表 是个group by ,然后select中使用了GROUP_CONCAT()
+SELECT place_id, GROUP_CONCAT( appname SEPARATOR &#39; &#39; ) appname, GROUP_CONCAT( appid SEPARATOR &#39; &#39; ) appid, type, CASE WHEN GROUP_CONCAT( appid SEPARATOR &#39;&#39; ) = &#39;&#39; THEN &#39;PC&#39; ELSE GROUP_CONCAT( platform SEPARATOR &#39; &#39; ) END AS platform FROM places_info GROUP BY place_id 这个SQL就用20秒,然后考虑做一个cache表,这样查起来就很快也很方便.
+做cache表用的是 insert into select ,
+然后报错
+1260 - Row 20094 was cut by GROUP_CONCAT(), Time: 0.153000s 查了一下说是,GROUP_CONCAT()最大允许结果长度默认是1024,这个值可以设置 group_concat_max_len
+SET global group_concat_max_len=15000; SET session group_concat_max_len=15000; 两种方式可以设置
+我选择的是session 只针对当次回话有效.然后再执行 insert into select{.language-plaintext .highlighter-rouge}就OK了
+</p>
+  </div>
+  <footer class="entry-footer"><span title='2020-11-04 21:57:00 +0800 CST'>November 4, 2020</span></footer>
+  <a class="entry-link" aria-label="post link to mysql中 GROUP_CONCAT() 的使用" href="http://localhost:1313/post/mysql%E4%B8%AD-group_concat-%E7%9A%84%E4%BD%BF%E7%94%A8/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">find命令常用参数
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>find命令 find [-H | -L | -P] [-EXdsx] [-f path] path ... [expression]
+-name find . -name &#34;*.java&#34; find . -iname &#34;*.java&#34; iname 不区分大小写
+-type find . -type d 按类型查找
+类型参数列表：
+f 普通文件 l 符号连接 d 目录 c 字符设备 b 块设备 s 套接字 p Fifo -size 文件大小单元：
+b —— 块（512字节） c —— 字节 w —— 字（2字节） k —— 千字节 M —— 兆字节 G —— 吉字节 find / -size &#43;10M find / -size -10M find / -size 10M &#43;搜索大于10M的
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2020-10-25 17:53:07 +0800 CST'>October 25, 2020</span></footer>
+  <a class="entry-link" aria-label="post link to find命令常用参数" href="http://localhost:1313/post/find%E5%91%BD%E4%BB%A4%E5%B8%B8%E7%94%A8%E5%8F%82%E6%95%B0/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">计算机的原码 反码 补码
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>原码 反码 补码 一:为什么会有原码反码补码? 为了让计算机更简单的计算数值.所以计算机用补码
+具体怎么实现,后边会说,接下来先看一下 什么是原码 反码和补码
+二:正数的原码 反码 补码 网上大多都是按 原码 反码 补码 分别去介绍,博主(本人)感觉这样的方法并不方便理解.所以改用 正数和负数来说
+如果按int来的话,0太多了,看着不方便,就是8位来表示吧.
+正数就是 把十进制的数 变成二进制而已
+正数的原码 反码 补码是一样的{.language-plaintext .highlighter-rouge}
+[&#43;1] = [00000001]（原码） = [00000001]（反码） = [00000001]（补码）
+三:负数的原码 反码 补码 原码:最高位为1{.language-plaintext .highlighter-rouge} 代表这个数是负数
+反码: 符号位不变{.language-plaintext .highlighter-rouge},其他位取反
+补码: 反码 &#43; 1{.language-plaintext .highlighter-rouge}
+[-1] = [10000001]（原码） = [11111110]（反码） = [11111111]（补码）
+四:原码 反码 补码出现的意义 他们的出现都是为了让计算机计算的更加简单,从而性能更好.
+知识: 1 - 1 = 1 &#43; (-1) 所以机器可以只有加法.
+首先如果只是原码计算,人可以很方便的计算出数值,因为人可以分清符号位.
+可是计算机想识别符号位,是很麻烦的.有什么方法能让计算机更简单的计算呢,于是就有了反码.
+接下来看,反码的计算
+1 - 1 = 1 &#43; (-1) = [0000 0001]原 &#43; [1000 0001]原 = [0000 0001]反 &#43; [1111 1110]反 = [1111 1111]反 = [1000 0000]原 = -0 反码已经可以让计算机计算更简单.但是为什么还有补码呢.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2020-09-26 19:18:07 +0800 CST'>September 26, 2020</span></footer>
+  <a class="entry-link" aria-label="post link to 计算机的原码 反码 补码" href="http://localhost:1313/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E5%8E%9F%E7%A0%81-%E5%8F%8D%E7%A0%81-%E8%A1%A5%E7%A0%81/"></a>
+</article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="prev" href="http://localhost:1313/post/">
+      «&nbsp;Prev&nbsp;
+    </a>
+    <a class="next" href="http://localhost:1313/post/page/3/">Next&nbsp;&nbsp;»
+    </a>
+  </nav>
+</footer>
+    </main>
+    
+<footer class="footer">
+        <span>© <a href="https://github.com/adityatelange/hugo-PaperMod/graphs/contributors">PaperMod Contributors</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

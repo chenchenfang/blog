@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>多线程初始化类死锁 | 我的博客</title>
+<meta name="keywords" content="">
+<meta name="description" content="多线程初始化类死锁
+前言
+有一个MQ消费者程序,很久没有更新重启了,最近更新了代码,然后升级.
+升级完之后看程序日志的打印,发现不往下走了,日志不动了,这个肯定不正常
+解决思路
+碰到这种问题,需要查看两个数据,一个是jvm内存数据也就是dump出来的数据,还有就是当前程序调用情况.
+由于程序是刚重启,内存的问题可能性不大,所以我使用jstack把当前程序堆栈调用情况输出到文件中.
+接下来就是检查这个文件中的内容,卡着不动,肯定是有代码了,然后发现很多都是java.lang.Thread.State: RUNNABLE,具体看如下
+&#34;thread名称***&#34; #32 [27804] prio=5 os_prio=0 cpu=1379.98ms elapsed=362.77s tid=0x00007fdd6c8ec670 nid=27804 waiting on condition  [0x00007fccf8d9b000]
+   java.lang.Thread.State: RUNNABLE
+	at staticdata.StaticDataLoad.loadCache(StaticDataLoad.java:129)
+	- waiting on the Class initialization monitor for tools.Tool
+	at staticdata.ExSystem.getCore_server_config(ExSystem.kt:1723)
+	at staticdata.MediaDealIdInfo.init(MediaDealIdInfo.java:15)
+	at staticdata.StaticDataLoad.&lt;init&gt;(StaticDataLoad.java:41)
+	at staticdata.MediaDealIdInfo.&lt;init&gt;(MediaDealIdInfo.java:10)
+	at staticdata.StaticData2.&lt;clinit&gt;(StaticData2.kt:452)
+    ************************
+	at java.lang.Thread.runWith(java.base@21.0.1/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21.0.1/Thread.java:1583)
+
+
+
+&#34;ConsumeMessageThread_******_2&#34; #192 [27968] prio=5 os_prio=0 cpu=8.05ms elapsed=361.06s tid=0x00007fc9fc0025c0 nid=27968 waiting on condition  [0x00007fcad01ec000]
+   java.lang.Thread.State: RUNNABLE
+	at bean.config.OkHttpConfig.&lt;init&gt;(OkHttpConfig.java:33)
+	- waiting on the Class initialization monitor for staticdata.StaticData2
+	at tools.Tool.&lt;clinit&gt;(Tool.java:3779)
+org.apache.rocketmq.client.impl.consumer.ConsumeMessageConcurrentlyService$ConsumeRequest.run(ConsumeMessageConcurrentlyService.java:402)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21.0.1/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21.0.1/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21.0.1/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21.0.1/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21.0.1/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21.0.1/Thread.java:1583)
+两个线程分别在等待对方类初始化完成,导致程序卡主不动了,由此就找到了原因">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/post/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%88%9D%E5%A7%8B%E5%8C%96%E7%B1%BB%E6%AD%BB%E9%94%81/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/post/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%88%9D%E5%A7%8B%E5%8C%96%E7%B1%BB%E6%AD%BB%E9%94%81/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="我的博客 (Alt + H)">我的博客</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      多线程初始化类死锁
+    </h1>
+    <div class="post-meta"><span title='2025-01-21 21:20:00 +0800 CST'>January 21, 2025</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="多线程初始化类死锁">多线程初始化类死锁<a hidden class="anchor" aria-hidden="true" href="#多线程初始化类死锁">#</a></h1>
+<h2 id="前言">前言<a hidden class="anchor" aria-hidden="true" href="#前言">#</a></h2>
+<p>有一个MQ消费者程序,很久没有更新重启了,最近更新了代码,然后升级.
+升级完之后看程序日志的打印,发现不往下走了,日志不动了,这个肯定不正常</p>
+<h2 id="解决思路">解决思路<a hidden class="anchor" aria-hidden="true" href="#解决思路">#</a></h2>
+<p>碰到这种问题,需要查看两个数据,一个是jvm内存数据也就是dump出来的数据,还有就是当前程序调用情况.
+由于程序是刚重启,内存的问题可能性不大,所以我使用<strong>jstack</strong>把当前程序堆栈调用情况输出到文件中.
+接下来就是检查这个文件中的内容,卡着不动,肯定是有代码了,然后发现很多都是<code>java.lang.Thread.State: RUNNABLE</code>,具体看如下</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="s">&#34;thread名称***&#34;</span><span class="w"> </span><span class="err">#</span><span class="n">32</span><span class="w"> </span><span class="o">[</span><span class="n">27804</span><span class="o">]</span><span class="w"> </span><span class="n">prio</span><span class="o">=</span><span class="n">5</span><span class="w"> </span><span class="n">os_prio</span><span class="o">=</span><span class="n">0</span><span class="w"> </span><span class="n">cpu</span><span class="o">=</span><span class="n">1379</span><span class="p">.</span><span class="na">98ms</span><span class="w"> </span><span class="n">elapsed</span><span class="o">=</span><span class="n">362</span><span class="p">.</span><span class="na">77s</span><span class="w"> </span><span class="n">tid</span><span class="o">=</span><span class="n">0x00007fdd6c8ec670</span><span class="w"> </span><span class="n">nid</span><span class="o">=</span><span class="n">27804</span><span class="w"> </span><span class="n">waiting</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">condition</span><span class="w">  </span><span class="o">[</span><span class="n">0x00007fccf8d9b000</span><span class="o">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   </span><span class="n">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">Thread</span><span class="p">.</span><span class="na">State</span><span class="p">:</span><span class="w"> </span><span class="n">RUNNABLE</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">staticdata</span><span class="p">.</span><span class="na">StaticDataLoad</span><span class="p">.</span><span class="na">loadCache</span><span class="p">(</span><span class="n">StaticDataLoad</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">129</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">-</span><span class="w"> </span><span class="n">waiting</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">Class</span><span class="w"> </span><span class="n">initialization</span><span class="w"> </span><span class="n">monitor</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">tools</span><span class="p">.</span><span class="na">Tool</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">staticdata</span><span class="p">.</span><span class="na">ExSystem</span><span class="p">.</span><span class="na">getCore_server_config</span><span class="p">(</span><span class="n">ExSystem</span><span class="p">.</span><span class="na">kt</span><span class="p">:</span><span class="n">1723</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">staticdata</span><span class="p">.</span><span class="na">MediaDealIdInfo</span><span class="p">.</span><span class="na">init</span><span class="p">(</span><span class="n">MediaDealIdInfo</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">15</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">staticdata</span><span class="p">.</span><span class="na">StaticDataLoad</span><span class="p">.</span><span class="o">&lt;</span><span class="n">init</span><span class="o">&gt;</span><span class="p">(</span><span class="n">StaticDataLoad</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">41</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">staticdata</span><span class="p">.</span><span class="na">MediaDealIdInfo</span><span class="p">.</span><span class="o">&lt;</span><span class="n">init</span><span class="o">&gt;</span><span class="p">(</span><span class="n">MediaDealIdInfo</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">10</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">staticdata</span><span class="p">.</span><span class="na">StaticData2</span><span class="p">.</span><span class="o">&lt;</span><span class="n">clinit</span><span class="o">&gt;</span><span class="p">(</span><span class="n">StaticData2</span><span class="p">.</span><span class="na">kt</span><span class="p">:</span><span class="n">452</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">************************</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">Thread</span><span class="p">.</span><span class="na">runWith</span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="na">base</span><span class="nd">@21.0.1</span><span class="o">/</span><span class="n">Thread</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">1596</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">Thread</span><span class="p">.</span><span class="na">run</span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="na">base</span><span class="nd">@21.0.1</span><span class="o">/</span><span class="n">Thread</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">1583</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="s">&#34;ConsumeMessageThread_******_2&#34;</span><span class="w"> </span><span class="err">#</span><span class="n">192</span><span class="w"> </span><span class="o">[</span><span class="n">27968</span><span class="o">]</span><span class="w"> </span><span class="n">prio</span><span class="o">=</span><span class="n">5</span><span class="w"> </span><span class="n">os_prio</span><span class="o">=</span><span class="n">0</span><span class="w"> </span><span class="n">cpu</span><span class="o">=</span><span class="n">8</span><span class="p">.</span><span class="na">05ms</span><span class="w"> </span><span class="n">elapsed</span><span class="o">=</span><span class="n">361</span><span class="p">.</span><span class="na">06s</span><span class="w"> </span><span class="n">tid</span><span class="o">=</span><span class="n">0x00007fc9fc0025c0</span><span class="w"> </span><span class="n">nid</span><span class="o">=</span><span class="n">27968</span><span class="w"> </span><span class="n">waiting</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">condition</span><span class="w">  </span><span class="o">[</span><span class="n">0x00007fcad01ec000</span><span class="o">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   </span><span class="n">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">Thread</span><span class="p">.</span><span class="na">State</span><span class="p">:</span><span class="w"> </span><span class="n">RUNNABLE</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">bean</span><span class="p">.</span><span class="na">config</span><span class="p">.</span><span class="na">OkHttpConfig</span><span class="p">.</span><span class="o">&lt;</span><span class="n">init</span><span class="o">&gt;</span><span class="p">(</span><span class="n">OkHttpConfig</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">33</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">-</span><span class="w"> </span><span class="n">waiting</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">Class</span><span class="w"> </span><span class="n">initialization</span><span class="w"> </span><span class="n">monitor</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">staticdata</span><span class="p">.</span><span class="na">StaticData2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">tools</span><span class="p">.</span><span class="na">Tool</span><span class="p">.</span><span class="o">&lt;</span><span class="n">clinit</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Tool</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">3779</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">org</span><span class="p">.</span><span class="na">apache</span><span class="p">.</span><span class="na">rocketmq</span><span class="p">.</span><span class="na">client</span><span class="p">.</span><span class="na">impl</span><span class="p">.</span><span class="na">consumer</span><span class="p">.</span><span class="na">ConsumeMessageConcurrentlyService$ConsumeRequest</span><span class="p">.</span><span class="na">run</span><span class="p">(</span><span class="n">ConsumeMessageConcurrentlyService</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">402</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">concurrent</span><span class="p">.</span><span class="na">Executors$RunnableAdapter</span><span class="p">.</span><span class="na">call</span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="na">base</span><span class="nd">@21.0.1</span><span class="o">/</span><span class="n">Executors</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">572</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">concurrent</span><span class="p">.</span><span class="na">FutureTask</span><span class="p">.</span><span class="na">run</span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="na">base</span><span class="nd">@21.0.1</span><span class="o">/</span><span class="n">FutureTask</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">317</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">concurrent</span><span class="p">.</span><span class="na">ThreadPoolExecutor</span><span class="p">.</span><span class="na">runWorker</span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="na">base</span><span class="nd">@21.0.1</span><span class="o">/</span><span class="n">ThreadPoolExecutor</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">1144</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">concurrent</span><span class="p">.</span><span class="na">ThreadPoolExecutor$Worker</span><span class="p">.</span><span class="na">run</span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="na">base</span><span class="nd">@21.0.1</span><span class="o">/</span><span class="n">ThreadPoolExecutor</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">642</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">Thread</span><span class="p">.</span><span class="na">runWith</span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="na">base</span><span class="nd">@21.0.1</span><span class="o">/</span><span class="n">Thread</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">1596</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">Thread</span><span class="p">.</span><span class="na">run</span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="na">base</span><span class="nd">@21.0.1</span><span class="o">/</span><span class="n">Thread</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="n">1583</span><span class="p">)</span><span class="w">
+</span></span></span></code></pre></div><p>两个线程分别在等待对方类初始化完成,导致程序卡主不动了,由此就找到了原因</p>
+<h2 id="解决方案">解决方案<a hidden class="anchor" aria-hidden="true" href="#解决方案">#</a></h2>
+<p>减少类初始化时候的代码,改为方法调用,避免不必要的麻烦.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>© <a href="https://github.com/adityatelange/hugo-PaperMod/graphs/contributors">PaperMod Contributors</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

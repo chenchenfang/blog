@@ -1,0 +1,1007 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Posts on 我的博客</title>
+    <link>http://localhost:1313/post/</link>
+    <description>Recent content in Posts on 我的博客</description>
+    <generator>Hugo -- 0.152.2</generator>
+    <language>en</language>
+    <copyright>PaperMod Contributors</copyright>
+    <lastBuildDate>Tue, 21 Jan 2025 21:20:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>多线程初始化类死锁</title>
+      <link>http://localhost:1313/post/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%88%9D%E5%A7%8B%E5%8C%96%E7%B1%BB%E6%AD%BB%E9%94%81/</link>
+      <pubDate>Tue, 21 Jan 2025 21:20:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%88%9D%E5%A7%8B%E5%8C%96%E7%B1%BB%E6%AD%BB%E9%94%81/</guid>
+      <description>&lt;h1 id=&#34;多线程初始化类死锁&#34;&gt;多线程初始化类死锁&lt;/h1&gt;
+&lt;h2 id=&#34;前言&#34;&gt;前言&lt;/h2&gt;
+&lt;p&gt;有一个MQ消费者程序,很久没有更新重启了,最近更新了代码,然后升级.
+升级完之后看程序日志的打印,发现不往下走了,日志不动了,这个肯定不正常&lt;/p&gt;
+&lt;h2 id=&#34;解决思路&#34;&gt;解决思路&lt;/h2&gt;
+&lt;p&gt;碰到这种问题,需要查看两个数据,一个是jvm内存数据也就是dump出来的数据,还有就是当前程序调用情况.
+由于程序是刚重启,内存的问题可能性不大,所以我使用&lt;strong&gt;jstack&lt;/strong&gt;把当前程序堆栈调用情况输出到文件中.
+接下来就是检查这个文件中的内容,卡着不动,肯定是有代码了,然后发现很多都是&lt;code&gt;java.lang.Thread.State: RUNNABLE&lt;/code&gt;,具体看如下&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;thread名称***&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;err&#34;&gt;#&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;32&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;27804&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;prio&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;os_prio&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cpu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;1379&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;98ms&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;elapsed&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;362&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;77s&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tid&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;0x00007fdd6c8ec670&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;nid&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;27804&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;waiting&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;on&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;condition&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;0x00007fccf8d9b000&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;   &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;lang&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;Thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;State&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;RUNNABLE&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;staticdata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;StaticDataLoad&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;loadCache&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;StaticDataLoad&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;129&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;waiting&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;on&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;the&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Class&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;initialization&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;monitor&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;for&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tools&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;Tool&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;staticdata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;ExSystem&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;getCore_server_config&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ExSystem&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;kt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;1723&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;staticdata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;MediaDealIdInfo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;init&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;MediaDealIdInfo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;staticdata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;StaticDataLoad&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;init&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;StaticDataLoad&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;41&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;staticdata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;MediaDealIdInfo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;init&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;MediaDealIdInfo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;staticdata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;StaticData2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;clinit&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;StaticData2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;kt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;452&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;************************&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;lang&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;Thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;runWith&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;base&lt;/span&gt;&lt;span class=&#34;nd&#34;&gt;@21.0.1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;1596&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;lang&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;Thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;run&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;base&lt;/span&gt;&lt;span class=&#34;nd&#34;&gt;@21.0.1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;1583&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;ConsumeMessageThread_******_2&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;err&#34;&gt;#&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;192&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;27968&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;prio&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;os_prio&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cpu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;05ms&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;elapsed&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;361&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;06s&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tid&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;0x00007fc9fc0025c0&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;nid&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;27968&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;waiting&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;on&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;condition&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;0x00007fcad01ec000&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;   &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;lang&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;Thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;State&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;RUNNABLE&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;bean&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;config&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;OkHttpConfig&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;init&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;OkHttpConfig&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;33&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;waiting&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;on&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;the&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Class&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;initialization&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;monitor&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;for&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;staticdata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;StaticData2&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tools&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;Tool&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;clinit&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Tool&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;3779&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;org&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;apache&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;rocketmq&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;client&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;impl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;consumer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;ConsumeMessageConcurrentlyService$ConsumeRequest&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;run&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ConsumeMessageConcurrentlyService&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;402&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;util&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;concurrent&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;Executors$RunnableAdapter&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;call&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;base&lt;/span&gt;&lt;span class=&#34;nd&#34;&gt;@21.0.1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Executors&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;572&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;util&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;concurrent&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;FutureTask&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;run&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;base&lt;/span&gt;&lt;span class=&#34;nd&#34;&gt;@21.0.1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;FutureTask&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;317&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;util&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;concurrent&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;ThreadPoolExecutor&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;runWorker&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;base&lt;/span&gt;&lt;span class=&#34;nd&#34;&gt;@21.0.1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadPoolExecutor&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;1144&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;util&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;concurrent&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;ThreadPoolExecutor$Worker&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;run&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;base&lt;/span&gt;&lt;span class=&#34;nd&#34;&gt;@21.0.1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ThreadPoolExecutor&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;642&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;lang&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;Thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;runWith&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;base&lt;/span&gt;&lt;span class=&#34;nd&#34;&gt;@21.0.1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;1596&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;	&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;lang&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;Thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;run&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;base&lt;/span&gt;&lt;span class=&#34;nd&#34;&gt;@21.0.1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Thread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;java&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;1583&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;两个线程分别在等待对方类初始化完成,导致程序卡主不动了,由此就找到了原因&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Okhttp发送请求卡住问题解决</title>
+      <link>http://localhost:1313/post/okhttp%E5%8F%91%E9%80%81%E8%AF%B7%E6%B1%82%E5%8D%A1%E4%BD%8F%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</link>
+      <pubDate>Thu, 18 Apr 2024 20:16:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/okhttp%E5%8F%91%E9%80%81%E8%AF%B7%E6%B1%82%E5%8D%A1%E4%BD%8F%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</guid>
+      <description>&lt;h1 id=&#34;okhttp发送请求卡住问题解决&#34;&gt;Okhttp发送请求卡住问题解决&lt;/h1&gt;
+&lt;p&gt;我们有一个消费者组是发送请求用的,一直有一个问题是有时候会堆积,然后就不消费了,重启后就恢复了.&amp;hellip;&lt;/p&gt;
+&lt;p&gt;于是我让运维加了一个脚本,在堆积的时候触发这个脚本(dump出来文件),然后重启消费者组,先这样解决,等上班了再检查dump的文件&lt;/p&gt;
+&lt;p&gt;于是乎就有了下边这个图里的内容,发现其他线程都在wait,只有一个在runing,然后看到堆栈信息卡在了这个方法,点进去查看这个是一个native方法,这个目前看是做不了什么了&lt;/p&gt;
+&lt;p&gt;突然想到我们都是ipv4,这个是调用的ipv6的类,于是去查了资料发现可以在启动项上加&lt;code&gt;-Djava.net.preferIPv4Stack=true&lt;/code&gt;{.language-plaintext
+.highlighter-rouge}来使用ipv4类,加上之后跑了一星期没有再出现之前的问题,问题解决&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/post/okhttp%E5%8F%91%E9%80%81%E8%AF%B7%E6%B1%82%E5%8D%A1%E4%BD%8F%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/ec7b4c186ba15d5d351d233a5bf37778fba02df9.png&#34;&gt;
+&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/post/okhttp%E5%8F%91%E9%80%81%E8%AF%B7%E6%B1%82%E5%8D%A1%E4%BD%8F%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/1bc26336542fd3fd66542f10e9ae5e8b35e34e1a.png&#34;&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>IDEA 2024.1 版本提高流畅度方法</title>
+      <link>http://localhost:1313/post/idea-2024.1-%E7%89%88%E6%9C%AC%E6%8F%90%E9%AB%98%E6%B5%81%E7%95%85%E5%BA%A6%E6%96%B9%E6%B3%95/</link>
+      <pubDate>Thu, 21 Mar 2024 20:25:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/idea-2024.1-%E7%89%88%E6%9C%AC%E6%8F%90%E9%AB%98%E6%B5%81%E7%95%85%E5%BA%A6%E6%96%B9%E6%B3%95/</guid>
+      <description>&lt;h1 id=&#34;idea-20241-版本提高流畅度方法-idea-20241-e78988e69cace68f90e9ab98e6b581e79585e5baa6e696b9e6b395-style&#34;&gt;IDEA 2024.1 版本提高流畅度方法 {#idea-2024.1-%E7%89%88%E6%9C%AC%E6%8F%90%E9%AB%98%E6%B5%81%E7%95%85%E5%BA%A6%E6%96%B9%E6%B3%95 style=&amp;quot;&amp;quot;}&lt;/h1&gt;
+&lt;p&gt;今天看IDEA出了2024.1 ,本着尝鲜的想法安装了&lt;/p&gt;
+&lt;p&gt;正好前段时间测试了JDK21的分代ZGC,可以说基本就没有stop the
+world,这不都安装了新版本了,顺便修改一下运行的JDK版本和垃圾回收机制&lt;/p&gt;
+&lt;p&gt;按两下&lt;code&gt;shift&lt;/code&gt;
+,然后输入runtime,选择红框这个&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/post/idea-2024.1-%E7%89%88%E6%9C%AC%E6%8F%90%E9%AB%98%E6%B5%81%E7%95%85%E5%BA%A6%E6%96%B9%E6%B3%95/f34b5267825663bced217b40b3bc677627733ac3.png&#34;&gt;
+&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/post/idea-2024.1-%E7%89%88%E6%9C%AC%E6%8F%90%E9%AB%98%E6%B5%81%E7%95%85%E5%BA%A6%E6%96%B9%E6%B3%95/e8e52b528c556c8ed1ee4c7135fc2b096ec06705.png&#34;&gt;
+然后会提示重启IDEA,重启完成后,开始修改垃圾回收为分代ZGC,打开修改框之后删除G1的开关,增加&lt;code&gt;-XX:+UseZGC -XX:+ZGenerational&lt;/code&gt;
+这两个参数,我顺便修改了&lt;code&gt;-Xms2500m -Xmx2500m&lt;/code&gt; 最大最小堆内存,就不需要扩容了,也可以降低卡顿&lt;/p&gt;
+&lt;p&gt;关于ZGC调优,经过我之前的测试,ZGC基本是不需要刻意调整的,如果非要调整加大堆内存量,就可以了.&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/post/idea-2024.1-%E7%89%88%E6%9C%AC%E6%8F%90%E9%AB%98%E6%B5%81%E7%95%85%E5%BA%A6%E6%96%B9%E6%B3%95/2495a98e5bfca9405f3570b81a45ce38542ad64a.png&#34;&gt;
+&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/post/idea-2024.1-%E7%89%88%E6%9C%AC%E6%8F%90%E9%AB%98%E6%B5%81%E7%95%85%E5%BA%A6%E6%96%B9%E6%B3%95/d03103c67f119b0dc01d2f86062b73636f859296.png&#34;&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>mysql连接数激增的问题解决过程</title>
+      <link>http://localhost:1313/post/mysql%E8%BF%9E%E6%8E%A5%E6%95%B0%E6%BF%80%E5%A2%9E%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E8%BF%87%E7%A8%8B/</link>
+      <pubDate>Sat, 30 Dec 2023 21:32:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/mysql%E8%BF%9E%E6%8E%A5%E6%95%B0%E6%BF%80%E5%A2%9E%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E8%BF%87%E7%A8%8B/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;平时mysql连接数大概在2000左右,会不定时随机的突然增加到5000,这个事情就很恐怖,所以需要查出来连接数增加的原因&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;分析与定位问题-e58886e69e90e4b88ee5ae9ae4bd8de997aee9a298-tabindex-1&#34;&gt;分析与定位问题 {#%E5%88%86%E6%9E%90%E4%B8%8E%E5%AE%9A%E4%BD%8D%E9%97%AE%E9%A2%98 tabindex=&amp;quot;-1&amp;quot;}&lt;/h2&gt;
+&lt;h3 id=&#34;分析现有的监控和数据-e58886e69e90e78eb0e69c89e79a84e79b91e68ea7e5928ce695b0e68dae-tabindex-1&#34;&gt;分析现有的监控和数据 {#%E5%88%86%E6%9E%90%E7%8E%B0%E6%9C%89%E7%9A%84%E7%9B%91%E6%8E%A7%E5%92%8C%E6%95%B0%E6%8D%AE tabindex=&amp;quot;-1&amp;quot;}&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;连接数 5000的报警钉钉信息&lt;/li&gt;
+&lt;li&gt;当连接数5000的时候,数据库里当前连接正在执行的状态&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;    SELECT  `id`,`user`,`host`,`db`,`command`,`time`,`state`,`info` FROM information_schema.processlist
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;分析第二个的数据,看到连接基本都在sleep,很少有正在执行的,由于连接数据库是通过内网代理连接的,所以不能直接看出来哪个或者哪些机器导致了这个问题&lt;/p&gt;
+&lt;h3 id=&#34;增加新的监控-e5a29ee58aa0e696b0e79a84e79b91e68ea7-tabindex-1&#34;&gt;增加新的监控 {#%E5%A2%9E%E5%8A%A0%E6%96%B0%E7%9A%84%E7%9B%91%E6%8E%A7 tabindex=&amp;quot;-1&amp;quot;}&lt;/h3&gt;
+&lt;p&gt;要定位哪里的问题就需要知道哪个程序或者哪个机器导致的,一步一步深入查,现在连哪个机器导致的问题都不知道,没办法去查,幸运的是这个问题是可以重现的,不必纠结过去没有数据,创造出新的数据再定位问题就行.&lt;br&gt;
+在这里就想到了&lt;code&gt;netstat&lt;/code&gt;{.language-plaintext
+.highlighter-rouge}命令,这个可以在代理机器上执行,查看哪些IP连接了mysql代理服务,并统计个数,于是就把这个命令的触发加到了发送钉钉报警的程序里.&lt;br&gt;
+到这里又想到了一个问题,异常数据有了之后,没有正常的数据做对比还是定位不出来问题,所以增加了每分钟执行一次来保存正常数据用于做对比.&lt;/p&gt;
+&lt;h3 id=&#34;分析新监控数据-e58886e69e90e696b0e79b91e68ea7e695b0e68dae-tabindex-1&#34;&gt;分析新监控数据 {#%E5%88%86%E6%9E%90%E6%96%B0%E7%9B%91%E6%8E%A7%E6%95%B0%E6%8D%AE tabindex=&amp;quot;-1&amp;quot;}&lt;/h3&gt;
+&lt;p&gt;等了1天终于等到了这个报警出现,对比平时的数据来说按连接数倒序,可以看到前边的大多数ip连接数都增加了,问了一下运维这些机器上都有哪些服务,被告知都是线上的tomcat服务.&lt;br&gt;
+到这里总算有了一些进展,但是到了这里又遇到问题了,tomcat里边虽然只有一个项目,但是这个项目中代码量很大,review代码是看不出来也没有办法都review一遍,有什么办法可以定位什么业务创建了连接呢?&lt;br&gt;
+之前读过一遍arthas的文档,对大概的命令以及功能有所了解,于是就想到了
+&lt;a href=&#34;https://arthas.aliyun.com/doc/stack.html&#34;&gt;stack&lt;/a&gt;{target=&amp;quot;_blank&amp;quot;} 这个命令,这个命令可以打印当前方法的调用堆栈信息,因为创建连接是必须new对象,那么监控这个new对象时候必须调用的方法就可以定位到具体的代码.&lt;br&gt;
+因为这个是随机性的bug,那么靠人手动执行是看不出问题的,于是使用了arthas提供的任务后台执行的方法,后台任务最多执行1天,同时需要指定抓取多少条堆栈信息.&lt;br&gt;
+之前没用过arthas,只是看文档知道执行stack会影响性能,但是具体影响多少性能并不清楚,这里找了一台线上tomcat手动执行stack,并观察了超时情况,超时只增加了0.5%,这个值可以接受,于是就开始后台执行了&lt;/p&gt;
+&lt;h3 id=&#34;等待新的监控数据-e7ad89e5be85e696b0e79a84e79b91e68ea7e695b0e68dae-tabindex-1&#34;&gt;等待新的监控数据 {#%E7%AD%89%E5%BE%85%E6%96%B0%E7%9A%84%E7%9B%91%E6%8E%A7%E6%95%B0%E6%8D%AE tabindex=&amp;quot;-1&amp;quot;}&lt;/h3&gt;
+&lt;p&gt;等啊等,终于等到了报警,查看对应时间的连接创建堆栈信息,问题出在缓存读取的方法上.&lt;br&gt;
+如果缓存没有就会读取数据库,同一时间突然有很多都去查询数据库了,原因是缓存里没有对应的数据了,缓存是一个concurrenthashmap,直接做的替换,而同时这个map会根据实际情况增加数据进入,由此可以判断是新加的那部分数据,缓存替换的时候消失了.&lt;/p&gt;
+&lt;h3 id=&#34;思考解决方案-e6809de88083e8a7a3e586b3e696b9e6a188-tabindex-1&#34;&gt;思考解决方案 {#%E6%80%9D%E8%80%83%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88 tabindex=&amp;quot;-1&amp;quot;}&lt;/h3&gt;
+&lt;p&gt;缓存直接做替换是不行的,会丢失新加入的数据,那首先想到的是更新数据,更新数据会有一个问题是按之前逻辑新增加的那部分数据就会一直存在,内存也会越占用越多,所以需要有删除过期数据的程序,那么问题又来了,这个不好写,就算写了也不好维护.&lt;br&gt;
+这里就想到了&lt;strong&gt;Caffeine缓存框架&lt;/strong&gt;,当真是很强大的本地内存缓存的框架,可以设置多久没有访问就会过期,也支持更新操作,对于我这个需求来说简直完美.&lt;br&gt;
+到了这里这个问题就算解决了,修改代码不过半小时的事情,主要的问题还是如何定位出来哪里代码有问题,&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>OkHttp优化过程记录</title>
+      <link>http://localhost:1313/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/</link>
+      <pubDate>Sat, 14 Oct 2023 10:06:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;近期查看有请求下游系统超时,按百分比的话是0.8%的样子,但是每天量很大,超时总数不到1亿次,如果这个可以优化一点,提升巨大的&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;1整体的探索过程&#34;&gt;1.整体的探索过程&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;目前只知道最终结果是超时,但是是不是哪里代码写的有问题从而导致的超时,还需要去定位&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;11初步定为问题&#34;&gt;1.1初步定为问题&lt;/h2&gt;
+&lt;p&gt;首先记录两个时间,第一个是请求一进来一直到拼接发送请求的位置这段代码的,第二个是拼接请求一直到Response(或者超时了)这段代码的时间&lt;br&gt;
+超时情况:&lt;br&gt;
+&lt;img alt=&#34;image-1697245681908&#34; loading=&#34;lazy&#34; src=&#34;http://localhost:1313/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/731e42fcb6ab158c698b819c85ddddb3ed95365b.png&#34;&gt;
+不超时情况:&lt;br&gt;
+&lt;img alt=&#34;image-1697245800201&#34; loading=&#34;lazy&#34; src=&#34;http://localhost:1313/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/4a003a4dca4afea5db00df10c5848a7bd241698d.png&#34;&gt;
+从图上来看,不管是超时和不超时都第一个时间都不长,所以是拼接请求到接受Response的时候引起的超时&lt;/p&gt;
+&lt;h2 id=&#34;12更细化的定位问题&#34;&gt;1.2更细化的定位问题&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;现在知道是和发送请求有关系了,那么应该对于这部分代码增加详细的记录,来分析问题&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;a href=&#34;https://zhaoxiaofa.com/2021/09/03/OkHttp%E7%9B%91%E6%8E%A7%E4%B8%8E%E8%B0%83%E4%BC%98/&#34;&gt;OkHttp监控与调优&lt;/a&gt;查资料的时候看到这个文章写的不错&lt;br&gt;
+经过一番查找资料,okhttp有一个EventListener,可以记录发送请求的各个步骤的时间&lt;br&gt;
+于是就有了下边的代码&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public class PrintingEventListener extends EventListener {
+    @Override
+    public void requestBodyEnd(@NotNull Call call, long byteCount) {
+        printEvent(&amp;#34;requestBodyEnd&amp;#34;);
+    }
+
+    @Override
+    public void requestBodyStart(@NotNull Call call) {
+        printEvent(&amp;#34;requestBodyStart&amp;#34;);
+    }
+
+    @Override
+    public void responseBodyEnd(@NotNull Call call, long byteCount) {
+        printEvent(&amp;#34;responseBodyEnd&amp;#34;);
+    }
+
+    @Override
+    public void responseBodyStart(@NotNull Call call) {
+        printEvent(&amp;#34;responseBodyStart&amp;#34;);
+    }
+
+    @Override
+    public void responseHeadersEnd(@NotNull Call call, @NotNull Response response) {
+        printEvent(&amp;#34;responseHeadersEnd&amp;#34;);
+    }
+
+    @Override
+    public void responseHeadersStart(@NotNull Call call) {
+        printEvent(&amp;#34;responseHeadersStart&amp;#34;);
+    }
+
+    public static final Factory FACTORY = new Factory() {
+
+        @Override public EventListener create(Call call) {
+            //唯一标识
+            String randAllString = Format.getRandAllString(10);
+            Random random = new Random(randAllString.hashCode());
+            double nextDouble = random.nextDouble();
+            //是tanx 与 10%的概率
+            if(call.request().url().toString().equals(&amp;#34;xxx&amp;#34;)
+                    &amp;amp;&amp;amp; nextDouble * 100 &amp;lt;= 10){
+                InitServlet.okhttpTimeLog.plus(randAllString,&amp;#34;startSend&amp;#34;,0L,&amp;#34;&amp;#34;);
+                //System.out.printf(&amp;#34;%s %s%n&amp;#34;, randAllString, call.request().url());
+                return new PrintingEventListener(randAllString, System.nanoTime());
+            }else{
+                return EventListener.NONE;
+            }
+        }
+    };
+
+    final String callId;
+    final long callStartNanos;
+
+    public PrintingEventListener(String callId, long callStartNanos) {
+        this.callId = callId;
+        this.callStartNanos = callStartNanos;
+    }
+
+    private void printEvent(String name) {
+        long elapsedNanos = System.nanoTime() - callStartNanos;
+        InitServlet.okhttpTimeLog.plus(callId,name,elapsedNanos / 1000000L,&amp;#34;&amp;#34;);
+        //System.out.printf(&amp;#34;%s %.0fms %s%n&amp;#34;, callId, elapsedNanos / 1000000d, name);
+    }
+
+    private void printEvent(String name,IOException ioe){
+        long elapsedNanos = System.nanoTime() - callStartNanos;
+        InitServlet.okhttpTimeLog.plus(callId,name,elapsedNanos / 1000000L,ioe.getMessage());
+        //System.out.printf(&amp;#34;%s %.0fms %s %s%n&amp;#34;, callId, elapsedNanos / 1000000d, name,ioe.getMessage());
+    }
+
+    @Override
+    public void callStart(Call call) {
+        printEvent(&amp;#34;callStart&amp;#34;);
+    }
+
+    @Override
+    public void dnsStart(Call call, String domainName) {
+        printEvent(&amp;#34;dnsStart&amp;#34;);
+    }
+
+    @Override
+    public void dnsEnd(Call call, String domainName, List&amp;lt;InetAddress&amp;gt; inetAddressList) {
+        printEvent(&amp;#34;dnsEnd&amp;#34;);
+    }
+
+    @Override
+    public void connectStart(Call call, InetSocketAddress inetSocketAddress, Proxy proxy) {
+        printEvent(&amp;#34;connectStart&amp;#34;);
+    }
+
+    @Override
+    public void secureConnectStart(Call call) {
+        printEvent(&amp;#34;secureConnectStart&amp;#34;);
+    }
+
+    @Override
+    public void secureConnectEnd(Call call, @Nullable Handshake handshake) {
+        printEvent(&amp;#34;secureConnectEnd&amp;#34;);
+    }
+
+    @Override
+    public void connectEnd(Call call, InetSocketAddress inetSocketAddress, Proxy proxy, @Nullable Protocol protocol) {
+        printEvent(&amp;#34;connectEnd&amp;#34;);
+    }
+
+    @Override
+    public void connectFailed(Call call, InetSocketAddress inetSocketAddress, Proxy proxy, @Nullable Protocol protocol, IOException ioe) {
+        printEvent(&amp;#34;connectFailed&amp;#34;);
+    }
+
+    @Override
+    public void connectionAcquired(Call call, Connection connection) {
+        printEvent(&amp;#34;connectionAcquired&amp;#34;);
+    }
+
+    @Override
+    public void requestHeadersStart(Call call) {
+        printEvent(&amp;#34;requestHeadersStart&amp;#34;);
+    }
+
+    @Override
+    public void requestHeadersEnd(Call call, Request request) {
+        printEvent(&amp;#34;requestHeadersEnd&amp;#34;);
+    }
+
+    @Override
+    public void connectionReleased(Call call, Connection connection) {
+        printEvent(&amp;#34;connectionReleased&amp;#34;);
+    }
+
+    @Override
+    public void requestFailed(Call call, IOException ioe) {
+        printEvent(&amp;#34;requestFailed&amp;#34;,ioe);
+    }
+
+    @Override
+    public void responseFailed(Call call, IOException ioe) {
+        printEvent(&amp;#34;responseFailed&amp;#34;,ioe);
+    }
+
+    @Override
+    public void callFailed(Call call, IOException ioe) {
+        printEvent(&amp;#34;callFailed&amp;#34;,ioe);
+    }
+
+    @Override public void callEnd(Call call) {
+        printEvent(&amp;#34;callEnd&amp;#34;);
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个是记录的结果,这里只放一条数据了,可以明显看出来仅仅是等待Response的时候超时&lt;br&gt;
+&lt;img alt=&#34;image-1697247499791&#34; loading=&#34;lazy&#34; src=&#34;http://localhost:1313/post/okhttp%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95/5c354dbb64d42457b94bbc762023cb6ae3d85bde.png&#34;&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>RocketMQ消息过大导致消费者消费不了,导致消息堆积</title>
+      <link>http://localhost:1313/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/</link>
+      <pubDate>Mon, 09 Jan 2023 22:49:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;周日的时候,突然消费者组就开始堆积了,然后临时解决方案想着重新起一个消费者组看看能不能恢复,然而并不能,无奈之下只能迁回使用redis作为消息中间件的方式,周一再细查一下&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;1-遇到的报错以及现象&#34;&gt;1 遇到的报错以及现象&lt;/h2&gt;
+&lt;p&gt;首先是看的是Dashboard,发现一会消费者组里边有一个消费者,一会没有&lt;br&gt;
+&lt;img alt=&#34;image&#34; loading=&#34;lazy&#34; src=&#34;http://localhost:1313/post/rocketmq%E6%B6%88%E6%81%AF%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E4%B8%8D%E4%BA%86%E5%AF%BC%E8%87%B4%E6%B6%88%E6%81%AF%E5%A0%86%E7%A7%AF/867497dc6749769319ea72912069a26fdc708319.png&#34;&gt;
+其次就该去看消费者组的业务日志打印了,虽然在消费,但是很慢&lt;br&gt;
+接下来就是看了消费组的RocketMQ日志打印,发现开始报错刷屏&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;2023-01-08 12:26:45,649 WARN RocketmqClient - execute the pull request exception
+org.apache.rocketmq.client.exception.MQBrokerException: CODE: 24  DESC: the consumer&amp;#39;s group info not exist
+See http://rocketmq.apache.org/docs/faq/ for further details. BROKER: 192.168.1.58:10911
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl.processPullResponse(MQClientAPIImpl.java:803)
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl.access$200(MQClientAPIImpl.java:175)
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl$2.operationComplete(MQClientAPIImpl.java:754)
+        at org.apache.rocketmq.remoting.netty.ResponseFuture.executeInvokeCallback(ResponseFuture.java:54)
+        at org.apache.rocketmq.remoting.netty.NettyRemotingAbstract$2.run(NettyRemotingAbstract.java:321)
+        at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+        at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+        at java.base/java.lang.Thread.run(Thread.java:833)
+
+2023-01-08 12:26:45,649 WARN RocketmqClient - execute the pull request exception
+org.apache.rocketmq.client.exception.MQBrokerException: CODE: 24  DESC: the consumer&amp;#39;s group info not exist
+See http://rocketmq.apache.org/docs/faq/ for further details. BROKER: 192.168.1.58:10911
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl.processPullResponse(MQClientAPIImpl.java:803)
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl.access$200(MQClientAPIImpl.java:175)
+        at org.apache.rocketmq.client.impl.MQClientAPIImpl$2.operationComplete(MQClientAPIImpl.java:754)
+        at org.apache.rocketmq.remoting.netty.ResponseFuture.executeInvokeCallback(ResponseFuture.java:54)
+        at org.apache.rocketmq.remoting.netty.NettyRemotingAbstract$2.run(NettyRemotingAbstract.java:321)
+        at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+        at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+        at java.base/java.lang.Thread.run(Thread.java:833)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个报错卡卡刷屏,于是乎只能去找RocketMQ的消费者client的源码了&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>java.lang.NoSuchFieldError 报错解决方法</title>
+      <link>http://localhost:1313/post/java.lang.nosuchfielderror-%E6%8A%A5%E9%94%99%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</link>
+      <pubDate>Thu, 30 Jun 2022 23:35:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/java.lang.nosuchfielderror-%E6%8A%A5%E9%94%99%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</guid>
+      <description>&lt;h1 id=&#34;javalangnosuchfielderror-报错排查问题&#34;&gt;java.lang.NoSuchFieldError 报错排查问题&lt;/h1&gt;
+&lt;p&gt;&lt;img alt=&#34;image&#34; loading=&#34;lazy&#34; src=&#34;http://localhost:1313/post/java.lang.nosuchfielderror-%E6%8A%A5%E9%94%99%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/a9c58a0b3a6a0b25b08486d487f39d56010073a9.png&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;排查过程&#34;&gt;排查过程&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;报这个错的根本原因是&lt;strong&gt;运行时&lt;/strong&gt;找不到对应的变量,那么为什么会找不到呢,因为运行的时候使用了错误的类&lt;/li&gt;
+&lt;li&gt;为什么会使用错误的类呢,是因为使用了错误版本的jar包&lt;/li&gt;
+&lt;li&gt;怎么会使用到错误的jar包呢 明明编译的时候好好的&lt;br&gt;
+我这个跟业务有点关系,对接别人的sdk,他们文档中写的是把5个jar包上传到自己的maven私服,然后项目中就可以使用了,最开始以为是他们自己的私有的jar,后来发现不是这样,有开源项目的jar,&lt;code&gt;bcprov-jdk15on&lt;/code&gt;这个加解密的包&lt;br&gt;
+上传到私库的时候,使用了跟开源库不同的groupId,导致打出来的包里有两个不同版本的相同jar包,导致运行时使用了错误的jar包的类&lt;/li&gt;
+&lt;li&gt;所以才会报这个错误&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;于是我把自己项目中的&lt;code&gt;bcprov-jdk15on&lt;/code&gt;版本升级到了sdk给的版本,&lt;br&gt;
+就可以正常运行了&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Linux下的atime mtime ctime查看以及修改</title>
+      <link>http://localhost:1313/post/linux%E4%B8%8B%E7%9A%84atime-mtime-ctime%E6%9F%A5%E7%9C%8B%E4%BB%A5%E5%8F%8A%E4%BF%AE%E6%94%B9/</link>
+      <pubDate>Mon, 18 Apr 2022 22:27:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/linux%E4%B8%8B%E7%9A%84atime-mtime-ctime%E6%9F%A5%E7%9C%8B%E4%BB%A5%E5%8F%8A%E4%BF%AE%E6%94%B9/</guid>
+      <description>&lt;h2 id=&#34;1三个时间的含义-1e4b889e4b8aae697b6e997b4e79a84e590abe4b989-tabindex-1&#34;&gt;1.三个时间的含义 {#1.%E4%B8%89%E4%B8%AA%E6%97%B6%E9%97%B4%E7%9A%84%E5%90%AB%E4%B9%89 tabindex=&amp;quot;-1&amp;quot;}&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;access time （atime）&lt;br&gt;
+当&amp;quot;该文件的内容被取用&amp;quot;时，就会更新这个读取时间 （access）。&lt;/li&gt;
+&lt;li&gt;modification time （mtime）&lt;br&gt;
+当该文件的&amp;quot;内容数据&amp;quot;变更时，就会更新这个时间，内容数据指的是文件的内容，而不是文件的属性或权限。&lt;/li&gt;
+&lt;li&gt;status time （ctime）&lt;br&gt;
+当该文件的&amp;quot;状态 （status）&amp;ldquo;改变时，就会更新这个时间。&lt;br&gt;
+举例来说，像是权限与属性被更改了，文件内容修改，都会修改这个时间。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;2查看这三个时间的命令-2e69fa5e79c8be8bf99e4b889e4b8aae697b6e997b4e79a84e591bde4bba4-tabindex-1&#34;&gt;2.查看这三个时间的命令 {#2.%E6%9F%A5%E7%9C%8B%E8%BF%99%E4%B8%89%E4%B8%AA%E6%97%B6%E9%97%B4%E7%9A%84%E5%91%BD%E4%BB%A4 tabindex=&amp;quot;-1&amp;rdquo;}&lt;/h2&gt;
+&lt;h3 id=&#34;1stat命令-1state591bde4bba4-tabindex-1&#34;&gt;1.stat命令 {#1.stat%E5%91%BD%E4%BB%A4 tabindex=&amp;quot;-1&amp;quot;}&lt;/h3&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;[root@agent-54 ~]# stat a.txt
+  File: &amp;#34;a.txt&amp;#34;
+  Size: 0           Blocks: 0          IO Block: 4096   普通空文件
+Device: fd01h/64769d    Inode: 394816      Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2021-01-01 01:01:00.000000000 +0800
+Modify: 2021-01-01 01:01:00.000000000 +0800
+Change: 2022-04-18 21:50:49.546704098 +0800
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;里边三个时间分别对应介绍的三个时间&lt;/p&gt;
+&lt;h3 id=&#34;2ls查看-2lse69fa5e79c8b-tabindex-1&#34;&gt;2.ls查看 {#2.ls%E6%9F%A5%E7%9C%8B tabindex=&amp;quot;-1&amp;quot;}&lt;/h3&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;[root@agent-54 ~]# ls  --full-time --time=atime a.txt
+-rw-r--r-- 1 root root 0 2021-01-01 01:01:00.000000000 +0800 a.txt
+[root@agent-54 ~]# ls  --full-time  a.txt
+-rw-r--r-- 1 root root 0 2021-01-01 01:01:00.000000000 +0800 a.txt
+[root@agent-54 ~]# ls  --full-time --time=ctime a.txt
+-rw-r--r-- 1 root root 0 2022-04-18 21:50:49.546704098 +0800 a.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;3touch修改access-time和modification-time-3touche4bfaee694b9access-timee5928cmodification-time-tabindex-1&#34;&gt;3.touch修改access time和modification time {#3.touch%E4%BF%AE%E6%94%B9access-time%E5%92%8Cmodification-time tabindex=&amp;quot;-1&amp;quot;}&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ctime是修改不了的，它是随着另外两个时间的变化而变化&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>ClassNotFoundException 和 NoClassDefFoundError 区别</title>
+      <link>http://localhost:1313/post/classnotfoundexception-%E5%92%8C-noclassdeffounderror-%E5%8C%BA%E5%88%AB/</link>
+      <pubDate>Sun, 11 Jul 2021 14:33:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/classnotfoundexception-%E5%92%8C-noclassdeffounderror-%E5%8C%BA%E5%88%AB/</guid>
+      <description>&lt;h1 id=&#34;classnotfoundexception-和-noclassdeffounderror&#34;&gt;ClassNotFoundException 和 NoClassDefFoundError&lt;/h1&gt;
+&lt;h2 id=&#34;1-classnotfoundexception&#34;&gt;1. &lt;em&gt;ClassNotFoundException&lt;/em&gt;&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;Class.forName()&lt;/em&gt;, &lt;em&gt;ClassLoader.loadClass()&lt;/em&gt; or
+&lt;em&gt;ClassLoader.findSystemClass()&lt;/em&gt; 一般是这几个方法,运行的时候会报错&lt;/p&gt;
+&lt;p&gt;因为这个去加载不存在的类&lt;/p&gt;
+&lt;p&gt;编译期间就没有这个类&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public void givenNoDrivers_whenLoadDriverClass_thenClassNotFoundException() 
+  throws ClassNotFoundException {
+      Class.forName(&amp;#34;oracle.jdbc.driver.OracleDriver&amp;#34;);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;2noclassdeffounderror&#34;&gt;2.&lt;em&gt;NoClassDefFoundError&lt;/em&gt;&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;一般是因为类初始化 没有成功
+因为类初始化只会初始化一次,第二次调用这个class
+用于生成对象或者是静态变量,都会报错&lt;/p&gt;
+&lt;p&gt;编译期间有这个类&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public class ClassWithInitErrors {
+    static int data = 1 / 0;
+}
+
+public class NoClassDefFoundErrorExample {
+    public ClassWithInitErrors getClassWithInitErrors() {
+        ClassWithInitErrors test;
+        try {
+            test = new ClassWithInitErrors();
+        } catch (Throwable t) {
+            System.out.println(t);
+        }
+        test = new ClassWithInitErrors();
+        return test;
+    }
+}
+
+@Test
+public void givenInitErrorInClass_whenloadClass_thenNoClassDefFoundError() {
+ 
+    NoClassDefFoundErrorExample sample
+     = new NoClassDefFoundErrorExample();
+    sample.getClassWithInitErrors();
+}
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    <item>
+      <title>spring MVC 校验Get请求的参数</title>
+      <link>http://localhost:1313/post/spring-mvc-%E6%A0%A1%E9%AA%8Cget%E8%AF%B7%E6%B1%82%E7%9A%84%E5%8F%82%E6%95%B0/</link>
+      <pubDate>Sun, 16 May 2021 07:22:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/spring-mvc-%E6%A0%A1%E9%AA%8Cget%E8%AF%B7%E6%B1%82%E7%9A%84%E5%8F%82%E6%95%B0/</guid>
+      <description>&lt;h1 id=&#34;spring-mvc-校验get请求的参数&#34;&gt;spring MVC 校验Get请求的参数&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;很多时候都是使用
+POST请求然后传入请求体，用类来接受请求数据，但有时候就只有一个参数，不想去创建类了，然后也想使用校验注解去校验这个参数，那么接下来会介绍这种方法。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;//在类上声明注解 @Validated 下方的参数可以直接使用 校验注解 进行校验
+@Validated
+public class UserAdminController {
+
+public JsonResult generatePortalJwtTokenByAdminGroupId( @NotNull Integer adminGroupId) throws CybercloudException {
+}
+}
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    <item>
+      <title>Java内存区域</title>
+      <link>http://localhost:1313/post/java%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F/</link>
+      <pubDate>Mon, 22 Mar 2021 08:02:07 +0800</pubDate>
+      <guid>http://localhost:1313/post/java%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F/</guid>
+      <description>&lt;h1 id=&#34;java内存区域&#34;&gt;Java内存区域&lt;/h1&gt;
+&lt;p&gt;首先看一下 Java 内存区域图:&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;java内存区域.png&#34; loading=&#34;lazy&#34; src=&#34;http://localhost:1313/post/java%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F/a5981dcdec7fcd97546177b37605d20357d4a1cb.png&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;程序计数器&#34;&gt;程序计数器&lt;/h2&gt;
+&lt;p&gt;程序计数器是一块较小的内存空间,它可以看做是当前线程所执行的字节码的行号指示器.&lt;/p&gt;
+&lt;p&gt;Java虚拟机的概念模型里,字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码执行.&lt;/p&gt;
+&lt;p&gt;在多线程中,为了线程切换后能恢复到正确的执行位置,每条线程都需要有一个独立的程序计数器,各个线程之间计数器互不影响,独立存储,所以为&amp;quot;线程私有&amp;quot;的内存.&lt;/p&gt;
+&lt;h2 id=&#34;java虚拟机栈&#34;&gt;Java虚拟机栈&lt;/h2&gt;
+&lt;p&gt;Java虚拟机栈也是&amp;quot;线程私有&amp;quot;,声明周期与线程相同.&lt;/p&gt;
+&lt;p&gt;Java虚拟机栈描述的是&lt;code&gt;Java方法执行的内存模型&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;每个方法被执行的时候,Java虚拟机都会创建一个栈帧用于存储&lt;code&gt;局部变量表&lt;/code&gt;操作数栈 动态连接 方法出口等信息.&lt;/p&gt;
+&lt;p&gt;每一个方法被调用直至执行完毕的过程,就对应着一个栈帧在虚拟机栈中从入栈到出栈的过程.&lt;/p&gt;
+&lt;p&gt;一般会把内存分为 堆内存和栈内存, 这里说的栈内存就是指
+Java虚拟机栈中的局部变量表&lt;/p&gt;
+&lt;p&gt;局部变量表中 存放了这个方法运行时各种Java虚拟机基本数据类型(boolean byte
+char short int float long double),对象引用和returnAddress类型.&lt;/p&gt;
+&lt;p&gt;这些数据类型的存储空间以局部变量槽(Slot)表示,其中long和double占用2个槽,其他占用1个槽,局部变量表所需的局部变量槽的数量在编译期间确定下来,一个槽的真正使用内存空间的多少,取决于具体虚拟机如何实现,可能是
+32位也可能是64位&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>java 四舍五入问题</title>
+      <link>http://localhost:1313/post/java-%E5%9B%9B%E8%88%8D%E4%BA%94%E5%85%A5%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Sat, 02 Jan 2021 15:42:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/java-%E5%9B%9B%E8%88%8D%E4%BA%94%E5%85%A5%E9%97%AE%E9%A2%98/</guid>
+      <description>&lt;h1 id=&#34;java-四舍五入问题&#34;&gt;java 四舍五入问题&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;前两天,在工作中遇到了一个问题,公司运营说:&amp;quot;我上传数据,没有给我四舍五入,是不是你程序有问题?&amp;quot;.那我当时肯定是想程序都用这么长时间了...不能有问题吧.
+但是还是说:&amp;quot;把具体的问题数据,以及什么可以重现,都说一下&amp;quot;,接下来是解决问题的心路历程.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;复现bug&#34;&gt;复现bug&lt;/h2&gt;
+&lt;p&gt;问题数据已经有了,接下来就是如何重现这个问题.主要的问题代码就是下边&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;long round = Math.round(Double.valueOf(&amp;#34;150.795&amp;#34;) * 100);
+        System.out.println(round);
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;其中&lt;code&gt;Double.valueOf(&amp;quot;150.795&amp;quot;)&lt;/code&gt;{.language-plaintext
+.highlighter-rouge}没有问题,然后 做&lt;code&gt;*100&lt;/code&gt;{.language-plaintext
+.highlighter-rouge}操作,这里结果就有问题了,结果是&lt;code&gt;15079.499999999998&lt;/code&gt;{.language-plaintext
+.highlighter-rouge}.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;之前都说 double不准什么的,也没体会到,现在真的是体会到了......&lt;/p&gt;
+&lt;h2 id=&#34;解决问题&#34;&gt;解决问题&lt;/h2&gt;
+&lt;p&gt;最终是需要实现
+四舍五入保留两位小数,那就去看&lt;code&gt;BigDecimal&lt;/code&gt;{.language-plaintext
+.highlighter-rouge}这个吧,都说这个计算是准确的.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;    private Double round(double f) {
+        BigDecimal b =  BigDecimal.valueOf(f);
+        return b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;最终使用的是这个解决方案.&lt;/p&gt;
+&lt;p&gt;但是这里也有个坑,就是传入的double最好是没有计算过的,不然也会出现上边
+&lt;code&gt;*100&lt;/code&gt;{.language-plaintext .highlighter-rouge}之后结果有问题&lt;/p&gt;
+&lt;p&gt;一般来说界面填写数值,然后传入到后端获取都是 &lt;code&gt;String&lt;/code&gt;{.language-plaintext
+.highlighter-rouge}类型的,直接调用方法就行,如果需要计算的话,用&lt;code&gt;BigDecimal&lt;/code&gt;{.language-plaintext
+.highlighter-rouge}计算&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>maven-shade-plugin 使用方法</title>
+      <link>http://localhost:1313/post/maven-shade-plugin-%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/</link>
+      <pubDate>Fri, 01 Jan 2021 21:14:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/maven-shade-plugin-%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/</guid>
+      <description>&lt;h1 id=&#34;maven-shade-plugin-使用方法&#34;&gt;maven-shade-plugin 使用方法&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;之所以发这个,是因为前段时间,spark项目打包,到服务器上之后,出现了不同版本jar包冲突的问题,然后使用了这个插件解决了问题.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;一-relocation的使用&#34;&gt;一: relocation的使用&lt;/h2&gt;
+&lt;p&gt;因为服务器上的jar不能删除,也不能替换,但是我用的jar包也只能用和服务器上不同的版本.&lt;/p&gt;
+&lt;p&gt;使用这个功能可以完美的解决这个问题&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;plugin&amp;gt;
+                &amp;lt;groupId&amp;gt;org.apache.maven.plugins&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;maven-shade-plugin&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;3.2.2&amp;lt;/version&amp;gt;
+                &amp;lt;executions&amp;gt;
+                    &amp;lt;execution&amp;gt;
+                        &amp;lt;phase&amp;gt;package&amp;lt;/phase&amp;gt;
+                        &amp;lt;goals&amp;gt;
+                            &amp;lt;goal&amp;gt;shade&amp;lt;/goal&amp;gt;
+                        &amp;lt;/goals&amp;gt;
+                        &amp;lt;configuration&amp;gt;
+                            &amp;lt;relocations&amp;gt;
+                                &amp;lt;relocation&amp;gt;
+                                    &amp;lt;!--原本的包名--&amp;gt;
+                                    &amp;lt;pattern&amp;gt;okhttp3&amp;lt;/pattern&amp;gt;
+                                    &amp;lt;!--要替换成的包名--&amp;gt;
+                                    &amp;lt;shadedPattern&amp;gt;fang7.okhttp3&amp;lt;/shadedPattern&amp;gt;
+                                &amp;lt;/relocation&amp;gt;
+                            &amp;lt;/relocations&amp;gt;
+                        &amp;lt;/configuration&amp;gt;
+                    &amp;lt;/execution&amp;gt;
+                &amp;lt;/executions&amp;gt;
+            &amp;lt;/plugin&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这样就可以解决包名冲突的问题&lt;/p&gt;
+&lt;h2 id=&#34;二-artifactset-excludes-去掉依赖&#34;&gt;二: artifactSet excludes 去掉依赖&lt;/h2&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;                               &amp;lt;plugin&amp;gt;
+                &amp;lt;groupId&amp;gt;org.apache.maven.plugins&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;maven-shade-plugin&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;3.2.2&amp;lt;/version&amp;gt;
+                &amp;lt;executions&amp;gt;
+                    &amp;lt;execution&amp;gt;
+                        &amp;lt;phase&amp;gt;package&amp;lt;/phase&amp;gt;
+                        &amp;lt;goals&amp;gt;
+                            &amp;lt;goal&amp;gt;shade&amp;lt;/goal&amp;gt;
+                        &amp;lt;/goals&amp;gt;
+                        &amp;lt;configuration&amp;gt;
+                            &amp;lt;artifactSet&amp;gt;
+                                &amp;lt;excludes&amp;gt;
+                                    &amp;lt;exclude&amp;gt;com.squareup.okhttp3:okhttp&amp;lt;/exclude&amp;gt;
+                                &amp;lt;/excludes&amp;gt;
+                            &amp;lt;/artifactSet&amp;gt;
+                        &amp;lt;/configuration&amp;gt;
+                    &amp;lt;/execution&amp;gt;
+                &amp;lt;/executions&amp;gt;
+            &amp;lt;/plugin&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;将该工程依赖的部分 Jar 包 include/exclude 掉。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>java中 YYYY-MM-dd 格式化问题</title>
+      <link>http://localhost:1313/post/java%E4%B8%AD-yyyy-mm-dd-%E6%A0%BC%E5%BC%8F%E5%8C%96%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Wed, 30 Dec 2020 20:57:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/java%E4%B8%AD-yyyy-mm-dd-%E6%A0%BC%E5%BC%8F%E5%8C%96%E9%97%AE%E9%A2%98/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;为什么说这个呢,因为今天新入职的开发问了我一个问题
+就是今天出现的bug,日期格式化出现了明年的时间&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;当时并没有仔细看,由于之前用的还是
+Date类(java8之后使用LocalDate类更好用),所以把LocalDate的一个代码复制给他了,试了试直接能用,也就没有管.&lt;br&gt;
+然后第二天早晨看微信公众号的时候看有人发了一个 关于
+&lt;code&gt;YYYY-MM-dd&lt;/code&gt;的消息,然后点进去看了一下才知道应该使用
+&lt;code&gt;yyyy-MM-dd&lt;/code&gt; ,记录一下.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;        String format = LocalDate.of(2020, 12, 27).format(DateTimeFormatter.ofPattern(&amp;#34;YYYY-MM-dd&amp;#34;));
+        System.out.println(&amp;#34;YYYY-MM-dd:&amp;#34;+format);
+
+        format = LocalDate.of(2020, 12, 27).format(DateTimeFormatter.ofPattern(&amp;#34;yyyy-MM-dd&amp;#34;));
+        System.out.println(&amp;#34;yyyy-MM-dd:&amp;#34;+format);
+
+        //输出的是
+        //YYYY-MM-dd:2021-12-27
+        //yyyy-MM-dd:2020-12-27
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;首先可以看源码&lt;br&gt;
+&lt;img alt=&#34;image.png&#34; loading=&#34;lazy&#34; src=&#34;http://localhost:1313/post/java%E4%B8%AD-yyyy-mm-dd-%E6%A0%BC%E5%BC%8F%E5%8C%96%E9%97%AE%E9%A2%98/116f6e456ef86b06b4d5728c328744ca00e9e8e7.png&#34;&gt;&lt;br&gt;
+周所在的年&lt;br&gt;
+查了一下有这个说法:&lt;br&gt;
+当天所在的周属于的年份，一周从周日开始，周六结束，只要本周跨年，那么这周就算入下一年&lt;/p&gt;
+&lt;p&gt;总结: 用&lt;code&gt;yyyy-MM-dd&lt;/code&gt; 就完事了&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Springboot中排除自动配置的 3 种方法</title>
+      <link>http://localhost:1313/post/springboot%E4%B8%AD%E6%8E%92%E9%99%A4%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E7%9A%84-3-%E7%A7%8D%E6%96%B9%E6%B3%95/</link>
+      <pubDate>Sun, 06 Dec 2020 20:21:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/springboot%E4%B8%AD%E6%8E%92%E9%99%A4%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E7%9A%84-3-%E7%A7%8D%E6%96%B9%E6%B3%95/</guid>
+      <description>&lt;h1 id=&#34;springboot中排除自动配置的-3-种方法&#34;&gt;Springboot中排除自动配置的 3 种方法&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;springboot中排除自动配置&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;1springbootapplication-注解中去掉&#34;&gt;1.@SpringBootApplication 注解中去掉&lt;/h2&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.context.ConfigurableApplicationContext;
+
+@SpringBootApplication(exclude = {MyAppAutoConfiguration.class})
+public class StartApplication {
+    public static void main(String[] args) {
+        ConfigurableApplicationContext run = SpringApplication.run(StartApplication.class, args);
+
+        Binder binder = Binder.get(run.getEnvironment());
+        String s = binder.bind(&amp;#34;myapp.company&amp;#34;, Bindable.of(String.class)).get();
+        System.out.println(s);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;2enableautoconfiguration注解中去掉&#34;&gt;2.@EnableAutoConfiguration注解中去掉&lt;/h2&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@EnableAutoConfiguration(exclude = {MyAppAutoConfiguration.class})
+public class ConfigTest {
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;3配置文件中去掉&#34;&gt;3.配置文件中去掉&lt;/h2&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;server:
+  port: 8081
+myapp:
+  name: 嘿嘿嘿
+  company: 我是公司
+spring:
+  autoconfigure:
+    exclude:
+      - com.fang7.spring.boot.autoconfigure.MyAppAutoConfiguration
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    <item>
+      <title>java创建线程的几种方式</title>
+      <link>http://localhost:1313/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/</link>
+      <pubDate>Thu, 19 Nov 2020 22:33:07 +0800</pubDate>
+      <guid>http://localhost:1313/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/</guid>
+      <description>&lt;h1 id=&#34;java创建线程的几种方式&#34;&gt;java创建线程的几种方式&lt;/h1&gt;
+&lt;h2 id=&#34;一-继承thread&#34;&gt;一: 继承Thread&lt;/h2&gt;
+&lt;p&gt;相当简单...&lt;/p&gt;
+&lt;p&gt;重写run方法即可&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public class TRunnbale extends Thread{
+    public static void main(String[] args) {
+        TRunnbale tRunnbale = new TRunnbale();
+        tRunnbale.start();
+    }
+    
+    @Override
+    public void run() {
+        System.out.println(&amp;#34;我要跑线程了&amp;#34;);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;二实现runnable接口&#34;&gt;二:实现Runnable接口&lt;/h2&gt;
+&lt;p&gt;这个是最简单的方式,直接实现Runnable接口 然后实现run()方法&lt;/p&gt;
+&lt;p&gt;最后放入 new Thread()中,然后 start()执行就行&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public class TRunnbale {
+    public static void main(String[] args) {
+        new Thread(new MyTask()).start();
+    }
+}
+
+class MyTask implements Runnable{
+
+    @Override
+    public void run() {
+        System.out.println(&amp;#34;我要跑线程了!&amp;#34;);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;三-实现callable接口&#34;&gt;三: 实现Callable接口&lt;/h2&gt;
+&lt;p&gt;这个接口里需要实现的那个方法,是有一个返回值的,然后可以完成每个线程结束后,返回一个参数,线程外部可以接受这个参数&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;Callable接口&#34; loading=&#34;lazy&#34; src=&#34;http://localhost:1313/post/java%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/e44d91252665822a8f2728bb7f6a568e82c8f1e7.png&#34;&gt;&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public class TRunnbale extends Thread{
+    public static void main(String[] args) {
+        FutureTask&amp;lt;String&amp;gt; futureTask = new FutureTask(new MyTask());
+        new Thread(futureTask, &amp;#34;线程A&amp;#34;).start();
+        try {
+            String result = futureTask.get();
+            System.out.println(result);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+
+class MyTask implements Callable&amp;lt;String&amp;gt;{
+
+    @Override
+    public String call() throws Exception {
+        // Do something...
+        return &amp;#34;线程结束!&amp;#34;;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这里有一个FutureTask&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>sql 行变列 列变行</title>
+      <link>http://localhost:1313/post/sql-%E8%A1%8C%E5%8F%98%E5%88%97-%E5%88%97%E5%8F%98%E8%A1%8C/</link>
+      <pubDate>Fri, 06 Nov 2020 21:04:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/sql-%E8%A1%8C%E5%8F%98%E5%88%97-%E5%88%97%E5%8F%98%E8%A1%8C/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;sql行变列 列变行 总是忘记,还是记下来比较好&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;行变列&#34;&gt;行变列&lt;/h1&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;CREATE TABLE tb_score(
+    id INT(11) NOT NULL auto_increment,
+    userid VARCHAR(20) NOT NULL COMMENT &amp;#39;用户id&amp;#39;,
+    subject VARCHAR(20) COMMENT &amp;#39;科目&amp;#39;,
+    score DOUBLE COMMENT &amp;#39;成绩&amp;#39;,
+    PRIMARY KEY(id)
+)ENGINE = INNODB DEFAULT CHARSET = utf8;
+
+INSERT INTO tb_score(userid,subject,score) VALUES (&amp;#39;001&amp;#39;,&amp;#39;语文&amp;#39;,90);
+INSERT INTO tb_score(userid,subject,score) VALUES (&amp;#39;001&amp;#39;,&amp;#39;数学&amp;#39;,92);
+INSERT INTO tb_score(userid,subject,score) VALUES (&amp;#39;001&amp;#39;,&amp;#39;英语&amp;#39;,80);
+INSERT INTO tb_score(userid,subject,score) VALUES (&amp;#39;002&amp;#39;,&amp;#39;语文&amp;#39;,88);
+INSERT INTO tb_score(userid,subject,score) VALUES (&amp;#39;002&amp;#39;,&amp;#39;数学&amp;#39;,90);
+INSERT INTO tb_score(userid,subject,score) VALUES (&amp;#39;002&amp;#39;,&amp;#39;英语&amp;#39;,75.5);
+INSERT INTO tb_score(userid,subject,score) VALUES (&amp;#39;003&amp;#39;,&amp;#39;语文&amp;#39;,70);
+INSERT INTO tb_score(userid,subject,score) VALUES (&amp;#39;003&amp;#39;,&amp;#39;数学&amp;#39;,85);
+INSERT INTO tb_score(userid,subject,score) VALUES (&amp;#39;003&amp;#39;,&amp;#39;英语&amp;#39;,90);
+INSERT INTO tb_score(userid,subject,score) VALUES (&amp;#39;003&amp;#39;,&amp;#39;政治&amp;#39;,82);
+&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;select userid,
+max(case `subject` when &amp;#39;语文&amp;#39; then score else 0 end ) as &amp;#39;语文&amp;#39;,
+max(case `subject` when &amp;#39;数学&amp;#39; then score else 0 end ) as &amp;#39;数学&amp;#39;,
+max(case `subject` when &amp;#39;英语&amp;#39; then score else 0 end ) as &amp;#39;英语&amp;#39;
+from tb_score
+group by userid
+&lt;/code&gt;&lt;/pre&gt;&lt;h1 id=&#34;列变行&#34;&gt;列变行&lt;/h1&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;CREATE TABLE tb_score1(
+    id INT(11) NOT NULL auto_increment,
+    userid VARCHAR(20) NOT NULL COMMENT &amp;#39;用户id&amp;#39;,
+    cn_score DOUBLE COMMENT &amp;#39;语文成绩&amp;#39;,
+    math_score DOUBLE COMMENT &amp;#39;数学成绩&amp;#39;,
+    en_score DOUBLE COMMENT &amp;#39;英语成绩&amp;#39;,
+    po_score DOUBLE COMMENT &amp;#39;政治成绩&amp;#39;,
+    PRIMARY KEY(id)
+)ENGINE = INNODB DEFAULT CHARSET = utf8;
+
+INSERT INTO tb_score1(userid,cn_score,math_score,en_score,po_score) VALUES (&amp;#39;001&amp;#39;,90,92,80,0);
+INSERT INTO tb_score1(userid,cn_score,math_score,en_score,po_score) VALUES (&amp;#39;002&amp;#39;,88,90,75.5,0);
+INSERT INTO tb_score1(userid,cn_score,math_score,en_score,po_score) VALUES (&amp;#39;003&amp;#39;,70,85,90,82);
+&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;select userid,&amp;#39;语文&amp;#39; as &amp;#39;subject&amp;#39;,cn_score as &amp;#39;score&amp;#39;
+from tb_score1
+group by userid
+union all 
+select userid,&amp;#39;数学&amp;#39; as &amp;#39;subject&amp;#39;,math_score as &amp;#39;score&amp;#39;
+from tb_score1
+group by userid
+union all 
+select userid,&amp;#39;英语&amp;#39; as &amp;#39;subject&amp;#39;,en_score as &amp;#39;score&amp;#39;
+from tb_score1
+group by userid
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    <item>
+      <title>mysql中 GROUP_CONCAT() 的使用</title>
+      <link>http://localhost:1313/post/mysql%E4%B8%AD-group_concat-%E7%9A%84%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Wed, 04 Nov 2020 21:57:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/mysql%E4%B8%AD-group_concat-%E7%9A%84%E4%BD%BF%E7%94%A8/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;最开始是让优化一个报表的SQL,因为时间太长了,然后看到join了一个表,这个表
+是个group by ,然后select中使用了GROUP_CONCAT()&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;SELECT
+    place_id,
+    GROUP_CONCAT( appname SEPARATOR &amp;#39; &amp;#39; ) appname,
+    GROUP_CONCAT( appid SEPARATOR &amp;#39; &amp;#39; ) appid,
+    type,
+CASE
+        
+        WHEN GROUP_CONCAT( appid SEPARATOR &amp;#39;&amp;#39; ) = &amp;#39;&amp;#39; THEN
+        &amp;#39;PC&amp;#39; ELSE GROUP_CONCAT( platform SEPARATOR &amp;#39; &amp;#39; ) 
+    END AS platform 
+FROM
+    places_info 
+GROUP BY
+    place_id
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个SQL就用20秒,然后考虑做一个cache表,这样查起来就很快也很方便.&lt;br&gt;
+做cache表用的是 insert into select ,&lt;br&gt;
+然后报错&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;1260 - Row 20094 was cut by GROUP_CONCAT(), Time: 0.153000s
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查了一下说是,GROUP_CONCAT()最大允许结果长度默认是1024,这个值可以设置
+&lt;a href=&#34;https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_group_concat_max_len&#34;&gt;group_concat_max_len&lt;/a&gt;&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;SET global group_concat_max_len=15000;
+SET session group_concat_max_len=15000;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;两种方式可以设置&lt;br&gt;
+我选择的是session 只针对当次回话有效.然后再执行
+&lt;code&gt;insert into select&lt;/code&gt;{.language-plaintext .highlighter-rouge}就OK了&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>find命令常用参数</title>
+      <link>http://localhost:1313/post/find%E5%91%BD%E4%BB%A4%E5%B8%B8%E7%94%A8%E5%8F%82%E6%95%B0/</link>
+      <pubDate>Sun, 25 Oct 2020 17:53:07 +0800</pubDate>
+      <guid>http://localhost:1313/post/find%E5%91%BD%E4%BB%A4%E5%B8%B8%E7%94%A8%E5%8F%82%E6%95%B0/</guid>
+      <description>&lt;h1 id=&#34;find命令&#34;&gt;find命令&lt;/h1&gt;
+&lt;p&gt;find [-H | -L | -P] [-EXdsx] [-f path] path ... [expression]&lt;/p&gt;
+&lt;h2 id=&#34;-name&#34;&gt;-name&lt;/h2&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;find . -name &amp;#34;*.java&amp;#34;
+find . -iname &amp;#34;*.java&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;iname 不区分大小写&lt;/p&gt;
+&lt;h2 id=&#34;-type&#34;&gt;-type&lt;/h2&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;find . -type d
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;按类型查找&lt;/p&gt;
+&lt;p&gt;类型参数列表：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;f&lt;/strong&gt; 普通文件&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;l&lt;/strong&gt; 符号连接&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;d&lt;/strong&gt; 目录&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;c&lt;/strong&gt; 字符设备&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;b&lt;/strong&gt; 块设备&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;s&lt;/strong&gt; 套接字&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;p&lt;/strong&gt; Fifo&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;-size&#34;&gt;-size&lt;/h2&gt;
+&lt;p&gt;文件大小单元：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;b&lt;/strong&gt; &amp;mdash;&amp;mdash; 块（512字节）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;c&lt;/strong&gt; &amp;mdash;&amp;mdash; 字节&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;a href=&#34;http://man.linuxde.net/w&#34;&gt;w&lt;/a&gt;&lt;/strong&gt; &amp;mdash;&amp;mdash; 字（2字节）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;k&lt;/strong&gt; &amp;mdash;&amp;mdash; 千字节&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;M&lt;/strong&gt; &amp;mdash;&amp;mdash; 兆字节&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;G&lt;/strong&gt; &amp;mdash;&amp;mdash; 吉字节&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;find / -size +10M
+find / -size -10M
+find / -size 10M
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;+搜索大于10M的&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>计算机的原码 反码 补码</title>
+      <link>http://localhost:1313/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E5%8E%9F%E7%A0%81-%E5%8F%8D%E7%A0%81-%E8%A1%A5%E7%A0%81/</link>
+      <pubDate>Sat, 26 Sep 2020 19:18:07 +0800</pubDate>
+      <guid>http://localhost:1313/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E5%8E%9F%E7%A0%81-%E5%8F%8D%E7%A0%81-%E8%A1%A5%E7%A0%81/</guid>
+      <description>&lt;h1 id=&#34;原码-反码-补码&#34;&gt;原码 反码 补码&lt;/h1&gt;
+&lt;h2 id=&#34;一为什么会有原码反码补码&#34;&gt;一:为什么会有原码反码补码?&lt;/h2&gt;
+&lt;p&gt;为了让计算机更简单的计算数值.所以计算机用补码&lt;/p&gt;
+&lt;p&gt;具体怎么实现,后边会说,接下来先看一下 什么是原码 反码和补码&lt;/p&gt;
+&lt;h2 id=&#34;二正数的原码-反码-补码&#34;&gt;二:正数的原码 反码 补码&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;网上大多都是按 原码 反码 补码
+分别去介绍,博主(本人)感觉这样的方法并不方便理解.所以改用
+正数和负数来说&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;如果按int来的话,0太多了,看着不方便,就是8位来表示吧.&lt;/p&gt;
+&lt;p&gt;正数就是 把十进制的数 变成二进制而已&lt;/p&gt;
+&lt;p&gt;正数的&lt;code&gt;原码 反码 补码是一样的&lt;/code&gt;{.language-plaintext .highlighter-rouge}&lt;/p&gt;
+&lt;p&gt;[+1] = [00000001]（原码） = [00000001]（反码） =
+[00000001]（补码）&lt;/p&gt;
+&lt;h2 id=&#34;三负数的原码-反码-补码&#34;&gt;三:负数的原码 反码 补码&lt;/h2&gt;
+&lt;p&gt;原码:&lt;code&gt;最高位为1&lt;/code&gt;{.language-plaintext .highlighter-rouge}
+代表这个数是负数&lt;/p&gt;
+&lt;p&gt;反码: &lt;code&gt;符号位不变&lt;/code&gt;{.language-plaintext .highlighter-rouge},其他位取反&lt;/p&gt;
+&lt;p&gt;补码: &lt;code&gt;反码 + 1&lt;/code&gt;{.language-plaintext .highlighter-rouge}&lt;/p&gt;
+&lt;p&gt;[-1] = [10000001]（原码） = [11111110]（反码） =
+[11111111]（补码）&lt;/p&gt;
+&lt;h2 id=&#34;四原码-反码-补码出现的意义&#34;&gt;四:原码 反码 补码出现的意义&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;他们的出现都是为了让计算机计算的更加简单,从而性能更好.&lt;/p&gt;
+&lt;p&gt;知识: 1 - 1 = 1 + (-1) 所以机器可以只有加法.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;首先如果只是原码计算,人可以很方便的计算出数值,因为人可以分清符号位.&lt;/p&gt;
+&lt;p&gt;可是计算机想识别符号位,是很麻烦的.有什么方法能让计算机更简单的计算呢,于是就有了反码.&lt;/p&gt;
+&lt;p&gt;接下来看,反码的计算&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt; 1 - 1 = 1 + (-1)
+
+ = [0000 0001]原 + [1000 0001]原
+
+ = [0000 0001]反 + [1111 1110]反
+
+ = [1111 1111]反
+
+ = [1000 0000]原
+
+ = -0
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;反码已经可以让计算机计算更简单.但是为什么还有补码呢.&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>移位运算符-java</title>
+      <link>http://localhost:1313/post/%E7%A7%BB%E4%BD%8D%E8%BF%90%E7%AE%97%E7%AC%A6-java/</link>
+      <pubDate>Tue, 22 Sep 2020 22:35:00 +0800</pubDate>
+      <guid>http://localhost:1313/post/%E7%A7%BB%E4%BD%8D%E8%BF%90%E7%AE%97%E7%AC%A6-java/</guid>
+      <description>&lt;h1 id=&#34;移位运算符&#34;&gt;移位运算符&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;最近在看HashMap的源码,其中有 &lt;code&gt;&amp;lt;&amp;lt;&lt;/code&gt;{.language-plaintext
+.highlighter-rouge}或者 &lt;code&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/code&gt;{.language-plaintext .highlighter-rouge}
+就很懵逼 然后就去学习了一下 总结一下,之后如果忘了还可以再过来看&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;原码反码补码&#34;&gt;原码,反码,补码&lt;/h2&gt;
+&lt;p&gt;计算机中存储数字是按二进制存储的,然后存的是补码.&lt;del&gt;目前只知道存的是补码,我也不知道为什么存补码&lt;/del&gt;&lt;br&gt;
+之后再详细看看再补充吧&lt;/p&gt;
+&lt;h2 id=&#34;1左移运算符&#34;&gt;1、左移运算符：&amp;lt;&amp;lt;&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;丢弃最高位，0补最低位&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;拿&lt;code&gt;int&lt;/code&gt;{.language-plaintext .highlighter-rouge}来举例,int是32位的.&lt;br&gt;
+就是二进制集体往左移动多少位&lt;br&gt;
+(如果移动的位数x大于等于32,那么就x%32取余)&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;123  ===&amp;gt;  
+0000 0000 0000 0000 0000 0000 0111 1011
+123 &amp;lt;&amp;lt; 2  ===&amp;gt;
+0000 0000 0000 0000 0000 0001 1110 1100
+
+
+移动位数大于等于32 那么就会取余,即: 32%32 = 0
+123  ===&amp;gt;  
+0000 0000 0000 0000 0000 0000 0111 1011
+123 &amp;lt;&amp;lt; 32  ===&amp;gt;
+0000 0000 0000 0000 0000 0000 0111 1011
+
+
+如果正好移位后的符号位为0 那么就会变成正数
+-123  ===&amp;gt;
+1111 1111 1111 1111 1111 1111 1000 0101
+-123 &amp;lt;&amp;lt; 25  ===&amp;gt; 
+0000 1010 0000 0000 0000 0000 0000 0000
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;2右移运算符带符号右移&#34;&gt;2、右移运算符(带符号右移)：&amp;gt;&amp;gt;&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;符号位不变，左边补上符号位&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>单例模式-Java设计模式</title>
+      <link>http://localhost:1313/post/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F-java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</link>
+      <pubDate>Sun, 06 Sep 2020 08:51:07 +0800</pubDate>
+      <guid>http://localhost:1313/post/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F-java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</guid>
+      <description>&lt;h1 id=&#34;单例模式&#34;&gt;单例模式&lt;/h1&gt;
+&lt;h2 id=&#34;一--枚举单例&#34;&gt;一 : 枚举单例&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;java中的枚举,只会初始化一次,所以枚举可以直接实现单例,直接上代码吧很简单&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public class Singleton {
+    private Singleton() {}
+
+    private enum EnumSingleton {
+        INSTANCE;
+
+        private Singleton singleton;
+        EnumSingleton() {
+            singleton = new Singleton();
+        }
+
+        public Singleton getSingleton() {
+            return singleton;
+        }
+    }
+
+    public static Singleton getSingleton() {
+        return EnumSingleton.INSTANCE.getSingleton();
+    }
+
+    public static void main(String[] args) {
+        Singleton singleton = Singleton.getSingleton();
+        System.out.println(singleton);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;二--内部类单例&#34;&gt;二 : 内部类单例&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在类的内部,再声明一个静态类,在静态类里边初始化外部的那个类&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public class SingletonInnerClass {
+    private SingletonInnerClass() {
+
+    }
+    private static class Singleton {
+        private static SingletonInnerClass singletonInnerClass = new SingletonInnerClass();
+    }
+
+    public static SingletonInnerClass getInstance(){
+        return Singleton.singletonInnerClass;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;第一次看这个类的时候,没有想明白为什么不直接在外部声明一个静态变量,现在想想应该是外部类&lt;code&gt;SingletonInnerClass&lt;/code&gt;{.language-plaintext
+.highlighter-rouge}初始化的时候会把静态变量全都完成初始化,这样就不能实现延迟加载(只有真正用的时候才加载).&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

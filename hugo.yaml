@@ -1,0 +1,101 @@
+# If your site is in 'https', then make sure your base url isn't written using 'http' otherwise your sitemap would
+# contain http (as opposeed to https) URLs. This would affect Google indexing of your URLs.
+baseURL: "https://chenchenfang.github.io/blog/"
+title: "Fang7's blog"
+copyright: "© [PaperMod Contributors](https://github.com/adityatelange/hugo-PaperMod/graphs/contributors)"
+theme: ["PaperMod"]
+
+enableInlineShortcodes: true
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+enableEmoji: true
+pygmentsUseClasses: true
+mainsections: ["posts", "papermod"]
+
+minify:
+  disableXML: true
+  # minifyOutput: true
+
+pagination:
+  disableAliases: false
+  pagerSize: 5
+
+languages:
+  ch:
+    languageName: "中文"
+    weight: 1
+    taxonomies:
+      category: categories
+      tag: tags
+      series: series
+    menu:
+      main:
+        - name: 归档
+          url: archives
+          weight: 5
+        - name: 搜索
+          url: search/
+          weight: 10
+        - name: 标签
+          url: tags/
+          weight: 10
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
+
+
+params:
+  env: production # to enable google analytics, opengraph, twitter-cards and schema.
+  description: "干"
+  author: fang7
+  # author: ["Me", "You"] # multiple authors
+  defaultTheme: light
+  # disableThemeToggle: true
+  ShowShareButtons: true
+  ShowReadingTime: true
+  # disableSpecial1stPost: true
+  displayFullLangName: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowRssButtonInSectionTermList: true
+  ShowAllPagesInArchive: true
+  ShowPageNums: true
+  ShowToc: true
+  TocOpen: true
+  comments: false
+  images: ["images/papermod-cover.png"]
+
+  profileMode:
+    enabled: true
+    title: 
+    subtitle: 
+    imageUrl: "images/papermod-cover.png"
+    imageTitle: 头像消失了
+    buttons:
+      - name: 文章
+        url: posts
+      - name: 分类
+        url: tags
+
+
+
+  socialIcons:
+    - name: email
+      title: 给我发邮件
+      url: "mailto:xieziang123@gmail.com"
+  
+  assets:
+    disableHLJS: true
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    noClasses: false
